@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-
+/*
     public void refreshSmsInbox() {
         ContentResolver contentResolver = getContentResolver();
         Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             arrayAdapter.add(str);
         } while (smsInboxCursor.moveToNext());
     }
-
+*/
     public void refreshSmsInbox(String smsMessage) {
         ContentResolver contentResolver = getContentResolver();
         Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
             if (grantResults.length == 1 &&
                     grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Toast.makeText(this, "Read SMS permission granted", Toast.LENGTH_SHORT).show();
-                refreshSmsInbox();
+                //refreshSmsInbox();
             } else {
                 Toast.makeText(this, "Read SMS permission denied", Toast.LENGTH_SHORT).show();
             }
