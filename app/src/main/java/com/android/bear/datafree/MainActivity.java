@@ -148,10 +148,13 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
         } else {
-            //switch num with whatever the twilio number should be for specific service
+            //Send sms to server
             toServer = botKey + input.getText().toString();
             smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
             Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+
+            //clear text in Edit text
+            input.setText("");
         }
     }
 
