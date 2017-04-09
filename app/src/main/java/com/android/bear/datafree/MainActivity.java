@@ -18,36 +18,38 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    //Variables
+
+    //---- Reading SMS ----!
     ArrayList<String> smsMessagesList = new ArrayList<>();
+    SmsManager smsManager = SmsManager.getDefault();
     ListView messages;
     ArrayAdapter arrayAdapter;
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
+    String incomingContent = "";    //stores incoming sms from server
+    String[] messageArray;          //array that stores all incoming sms in proper order
+                                    //uses indexKeys to order correctly
 
-    // for sending messages
+    //---- USER INPUT ----!
     EditText input;
-    SmsManager smsManager = SmsManager.getDefault();
+    String toServer = "";   //final String that gets texted to the server
+    String botKey = "aa";   //first 2 chars of toServer to identify which bot requested
 
-    //Buttons
+    //---- Buttons and User UI ----!
     Button button0, button1, button2;
-    //info box
-    TextView infoBox;
+    TextView infoBox;       //displays info for currently selected bot
 
-    //content is the string that stores incoming text messages
-    String content = "";
-    //toServer is final string that gets sent to the server
-    String toServer = "";
-    // botKey is used as the first two digits in sms so server knows what bot to use
-    String botKey = "aa";
+    //---- Bot State Machine ----!
+    String[] buttonArray;       //stores names of bots so BotFinder.java can use them
+    int currentBotIndex = 0;    //which bot is selected in buttonArray
 
-    //Store the names of bots into buttonArray so BotFinder.java can use them
-    String[] buttonArray;
-    int currentBotIndex = 0;
-
-    BotFinder botFinder = new BotFinder();
+    //---- Classes ----!
+    BotFinder botFinder = new BotFinder();  //pass in bot name, get important info
+                                            //key, name, info
+    KeyConverter keyChange = new KeyConverter();
 
     static MainActivity inst;
 
@@ -96,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
         button0.setText(botFinder.getName(buttonArray[0]));
         button1.setText(botFinder.getName(buttonArray[1]));
         button2.setText(botFinder.getName(buttonArray[2]));
+
+        updateScreen();
     }
 
     public void refreshSmsInbox(String smsMessage) {
@@ -106,20 +110,11 @@ public class MainActivity extends AppCompatActivity {
         if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
 
         //Add message to content string
-        content = content +" " + smsMessage;
+        incomingContent = incomingContent +" " + smsMessage;
 
         //display
         arrayAdapter.clear();
-        arrayAdapter.add(content);
-
-        //Adds rest of inbox
-        /*
-        do {
-            String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                    "\n" + smsInboxCursor.getString(indexBody) + "\n";
-            arrayAdapter.add(str);
-        } while (smsInboxCursor.moveToNext());
-        */
+        arrayAdapter.add(incomingContent);
     }
 
     public void updateInbox(String smsMessageStr) {

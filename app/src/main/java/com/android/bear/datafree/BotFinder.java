@@ -2,6 +2,7 @@ package com.android.bear.datafree;
 
 /**
  * Created by bear on 4/8/17.
+ * Returns important info for bots when passed in name
  */
 
 class BotFinder {
