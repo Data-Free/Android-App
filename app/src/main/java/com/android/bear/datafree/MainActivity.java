@@ -15,12 +15,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
     //Variables
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
@@ -33,18 +33,26 @@ public class MainActivity extends AppCompatActivity {
 
     //Buttons
     Button button0, button1, button2;
+    //info box
+    TextView infoBox;
 
     //content is the string that stores incoming text messages
-    static String content = "";
+    String content = "";
     //toServer is final string that gets sent to the server
-    static String toServer = "";
+    String toServer = "";
     // botKey is used as the first two digits in sms so server knows what bot to use
-    static String botKey = "aa";
+    String botKey = "aa";
+
     //Store the names of bots into buttonArray so BotFinder.java can use them
-    static String[] buttonArray;
+    String[] buttonArray;
+    int currentBotIndex = 0;
 
     BotFinder botFinder = new BotFinder();
+
     static MainActivity inst;
+
+    //End of declaring variables
+    //----------------------------------------------------------------------
 
     public static MainActivity instance() {
         return inst;
@@ -82,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         button0 = (Button) findViewById(R.id.bot_button0);
         button1 = (Button) findViewById(R.id.bot_button1);
         button2 = (Button) findViewById(R.id.bot_button2);
+        infoBox = (TextView) findViewById(R.id.infoBox);
 
         //set up button names
         button0.setText(botFinder.getName(buttonArray[0]));
@@ -169,16 +178,24 @@ public class MainActivity extends AppCompatActivity {
     public void updateScreen() {
         //update bot names
 
+        //update botInfo
+        infoBox.setText(botFinder.getInfo(buttonArray[currentBotIndex]));
     }
 
     //Change
     public void onClick_B0(View view) {
+        currentBotIndex = 0;
         botKey = botFinder.getKey(buttonArray[0]);
+        updateScreen();
     }
     public void onClick_B1(View view) {
+        currentBotIndex = 1;
         botKey = botFinder.getKey(buttonArray[1]);
+        updateScreen();
     }
     public void onClick_B2(View view) {
+        currentBotIndex = 2;
         botKey = botFinder.getKey(buttonArray[2]);
+        updateScreen();
     }
 }

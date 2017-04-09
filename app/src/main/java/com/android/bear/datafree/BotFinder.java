@@ -34,14 +34,13 @@ public class BotFinder {
                 result = "This bot provides updates for the app";
                 break;
             case "suggestions":
-                result = "This bot will send your suggestions for " +
-                        "new bots to the team at Data Free!";
+                result = "Send your bot suggestions to the Data Free team!";
                 break;
             case "wikipedia":
                 result = "View wikipedia articles";
                 break;
             case "urban_dic":
-                result = "Ever wonder what something really means? Find " +
+                result = "Ever wonder what something really means?\nFind " +
                         "out now on urban dictionary!";
                 break;
         }
