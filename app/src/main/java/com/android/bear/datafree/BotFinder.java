@@ -4,32 +4,38 @@ package com.android.bear.datafree;
  * Created by bear on 4/8/17.
  */
 
-public class BotFinder {
-    public BotFinder() { }
+class BotFinder {
+    BotFinder() { }
 
     //Given a String id, return proper key
-    public String getKey(String name) {
+    String getKey(String name) {
         String result = "";
         switch(name) {
-            case "updates":
+            case "tutorial":
                 result = "aa";
                 break;
-            case "suggestions":
+            case "updates":
                 result = "ab";
                 break;
-            case "wikipedia":
+            case "suggestions":
                 result = "ac";
                 break;
-            case "urban_dic":
+            case "wikipedia":
                 result = "ad";
+                break;
+            case "urban_dic":
+                result = "ae";
                 break;
         }
         return result;
     }
 
-    public String getInfo(String name) {
+    String getInfo(String name) {
         String result = "";
         switch(name) {
+            case "tutorial":
+                result = "Learn how to use data free";
+                break;
             case "updates":
                 result = "This bot provides updates for the app";
                 break;
@@ -47,14 +53,17 @@ public class BotFinder {
         return result;
     }
 
-    public String getName(String name) {
+    String getName(String name) {
         String result = "";
         switch(name) {
+            case "tutorial":
+                result = "Tutorial";
+                break;
             case "updates":
-                result = "updates";
+                result = "Updates";
                 break;
             case "suggestions":
-                result = "suggest";
+                result = "Suggest";
                 break;
             case "wikipedia":
                 result = "Wiki";
