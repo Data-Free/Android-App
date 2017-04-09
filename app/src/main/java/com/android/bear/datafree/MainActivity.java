@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    //Variables
     ArrayList<String> smsMessagesList = new ArrayList<>();
     ListView messages;
     ArrayAdapter arrayAdapter;
@@ -30,14 +31,19 @@ public class MainActivity extends AppCompatActivity {
     EditText input;
     SmsManager smsManager = SmsManager.getDefault();
 
+    //Buttons
+    Button button0, button1, button2;
+
     //content is the string that stores incoming text messages
     static String content = "";
-
+    //toServer is final string that gets sent to the server
     static String toServer = "";
-
     // botKey is used as the first two digits in sms so server knows what bot to use
     static String botKey = "aa";
+    //Store the names of bots into buttonArray so BotFinder.java can use them
+    static String[] buttonArray;
 
+    BotFinder botFinder = new BotFinder();
     static MainActivity inst;
 
     public static MainActivity instance() {
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //set up sms reading
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         messages = (ListView) findViewById(R.id.messages);
@@ -65,22 +72,23 @@ public class MainActivity extends AppCompatActivity {
             //refreshSmsInbox();
         }
 
+        //set up buttonArray
+        buttonArray = new String[4];    //length = number of bots
+        buttonArray[0] = "suggestions";
+        buttonArray[1] = "wikipedia";
+        buttonArray[2] = "urban_dic";
+
+        //set up buttons
+        button0 = (Button) findViewById(R.id.bot_button0);
+        button1 = (Button) findViewById(R.id.bot_button1);
+        button2 = (Button) findViewById(R.id.bot_button2);
+
+        //set up button names
+        button0.setText(botFinder.getName(buttonArray[0]));
+        button1.setText(botFinder.getName(buttonArray[1]));
+        button2.setText(botFinder.getName(buttonArray[2]));
     }
-/*
-    public void refreshSmsInbox() {
-        ContentResolver contentResolver = getContentResolver();
-        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
-        int indexBody = smsInboxCursor.getColumnIndex("body");
-        int indexAddress = smsInboxCursor.getColumnIndex("address");
-        if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
-        arrayAdapter.clear();
-        do {
-            String str = "SMS From: " + smsInboxCursor.getString(indexAddress) +
-                    "\n" + smsInboxCursor.getString(indexBody) + "\n";
-            arrayAdapter.add(str);
-        } while (smsInboxCursor.moveToNext());
-    }
-*/
+
     public void refreshSmsInbox(String smsMessage) {
         ContentResolver contentResolver = getContentResolver();
         Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
@@ -158,8 +166,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateScreen() {
+        //update bot names
+
+    }
+
     //Change
-    public void onClick_Suggest(View view) { botKey = "aa"; }
-    public void onClick_Wiki(View view) { botKey = "ab"; }
-    public void onClick_Urban(View view) { botKey = "ac"; }
+    public void onClick_B0(View view) {
+        botKey = botFinder.getKey(buttonArray[0]);
+    }
+    public void onClick_B1(View view) {
+        botKey = botFinder.getKey(buttonArray[1]);
+    }
+    public void onClick_B2(View view) {
+        botKey = botFinder.getKey(buttonArray[2]);
+    }
 }

@@ -32,28 +32,28 @@
                 android:layout_height="match_parent">
 
                 <Button
-                    android:id="@+id/suggestions_Button"
+                    android:id="@+id/bot_button0"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:onClick="onClick_Suggest"
-                    android:text="Suggest" />
+                    android:onClick="onClick_B0"
+                    android:text="b0" />
 
                 <Button
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Wiki"
-                    android:onClick="onClick_Wiki"
-                    android:id="@+id/wiki_button" />
+                    android:text="b1"
+                    android:onClick="onClick_B1"
+                    android:id="@+id/bot_button1" />
 
                 <Button
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Urban Dic"
-                    android:onClick="onClick_Urban"
-                    android:id="@+id/urbanDic_button" />
+                    android:text="b2"
+                    android:onClick="onClick_B2"
+                    android:id="@+id/bot_button2" />
 
                 <Button
                     style="?android:attr/buttonStyleSmall"
