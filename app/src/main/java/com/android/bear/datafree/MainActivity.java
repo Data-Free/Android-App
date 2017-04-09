@@ -23,7 +23,8 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    //---- Reading SMS ----!
+    //---- Reading SMS -----!
+    static MainActivity inst;
     ArrayList<String> smsMessagesList = new ArrayList<>();
     SmsManager smsManager = SmsManager.getDefault();
     ListView messages;
@@ -33,25 +34,27 @@ public class MainActivity extends AppCompatActivity {
     String[] messageArray;          //array that stores all incoming sms in proper order
                                     //uses indexKeys to order correctly
 
-    //---- USER INPUT ----!
+    //---- User Input -----!
     EditText input;
     String toServer = "";   //final String that gets texted to the server
     String botKey = "aa";   //first 2 chars of toServer to identify which bot requested
 
-    //---- Buttons and User UI ----!
+    //---- Buttons and User UI -----!
     Button button0, button1, button2;
-    TextView infoBox;       //displays info for currently selected bot
+    TextView infoBox;           //displays info for currently selected bot
+    TextView messageDisplay;    //test variable to display message
 
-    //---- Bot State Machine ----!
+    //---- Bot State Machine -----!
     String[] buttonArray;       //stores names of bots so BotFinder.java can use them
     int currentBotIndex = 0;    //which bot is selected in buttonArray
 
-    //---- Classes ----!
+    //---- Classes -----!
     BotFinder botFinder = new BotFinder();  //pass in bot name, get important info
                                             //key, name, info
-    KeyConverter keyChange = new KeyConverter();
+    KeyConverter keyChange = new KeyConverter();    //performs useful functions on
+                                                    //botKeys, indexes
+    ArrayHandler arrayHandler = new ArrayHandler(); //useful functions on arrays
 
-    static MainActivity inst;
 
     //End of declaring variables
     //----------------------------------------------------------------------
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         button1 = (Button) findViewById(R.id.bot_button1);
         button2 = (Button) findViewById(R.id.bot_button2);
         infoBox = (TextView) findViewById(R.id.infoBox);
+        messageDisplay = (TextView) findViewById(R.id.messageDisplay);
 
         //set up button names
         button0.setText(botFinder.getName(buttonArray[0]));
@@ -109,12 +113,33 @@ public class MainActivity extends AppCompatActivity {
         int indexAddress = smsInboxCursor.getColumnIndex("address");
         if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
 
-        //Add message to content string
-        incomingContent = incomingContent +" " + smsMessage;
+        //check whether incoming sms is a header, content, or end sms
+        if(smsMessage.substring(0,1).contains("{")) {
+            //check if it is a header text
 
-        //display
-        arrayAdapter.clear();
-        arrayAdapter.add(incomingContent);
+            //<Debug tools>
+            //String display = smsMessage.substring(39,41);
+            //display = display + ": " + keyChange.keyToInt(display);
+            //messageDisplay.setText(display);
+
+            //create new array the size of the number of incoming sms packages
+            messageArray = new String[keyChange.keyToInt(smsMessage.substring(1,3))];
+        } else if(smsMessage.substring(0,1).contains("}")) {
+
+        } else {
+            //Add message to content string and display it
+            incomingContent = incomingContent +" " + smsMessage;
+            arrayAdapter.clear();
+            arrayAdapter.add(incomingContent);
+
+            //get sms index and use it to put String in proper place
+            int mIndex = keyChange.keyToInt(smsMessage.substring(0,2));
+            messageArray[mIndex] = smsMessage.substring(2);
+
+            if(arrayHandler.checkFull(messageArray)) {
+                messageDisplay.setText(ArrayHandler.createString(messageArray));
+            }
+        }
     }
 
     public void updateInbox(String smsMessageStr) {

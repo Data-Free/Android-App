@@ -94,9 +94,9 @@
 
         <!--Should display message when totally collected -->
         <TextView
-            android:id="@+id/message"
+            android:id="@+id/messageDisplay"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:text="TextView" />
 
         <!--User Input bar at the bottom of the screen-->
