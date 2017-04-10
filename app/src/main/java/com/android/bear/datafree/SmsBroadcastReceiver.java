@@ -13,6 +13,7 @@ import android.widget.Toast;
 public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     public static final String SMS_BUNDLE = "pdus";
+    public VerifiedNumbers checkNumbers = new VerifiedNumbers();
 
     public void onReceive(Context context, Intent intent) {
         Bundle intentExtras = intent.getExtras();
@@ -22,6 +23,7 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
         if (intentExtras != null) {
             Object[] sms = (Object[]) intentExtras.get(SMS_BUNDLE);
             String smsMessageStr = "";
+            String address = "";
             for (int i = 0; i < sms.length; ++i) {
                 String format = intentExtras.getString("format");
                 SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) sms[i], format);
@@ -29,14 +31,17 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 String smsBody = smsMessage.getMessageBody();
 
                 //Use Address to check whether or not its a twilio number
-                String address = smsMessage.getOriginatingAddress();
+                address = smsMessage.getOriginatingAddress();
 
                 //smsMessageStr += "SMS From: " + address + "\n";
-                smsMessageStr += smsBody + "\n";
+                smsMessageStr += smsBody;
             }
 
-            MainActivity inst = MainActivity.instance();
-            inst.updateInbox(smsMessageStr);
+            //only read the sms if it's a verified Data Free number
+            if(checkNumbers.isValid(address)) {
+                MainActivity inst = MainActivity.instance();
+                inst.updateInbox(smsMessageStr);
+            }
         }
     }
 }

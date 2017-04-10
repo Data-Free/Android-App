@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
             //create new array the size of the number of incoming sms packages
             messageArray = new String[keyChange.keyToInt(smsMessage.substring(1,3))];
         } else if(smsMessage.substring(0,1).contains("}")) {
-
+            //for end text
         } else {
             //Add message to content string and display it
             incomingContent = incomingContent +" " + smsMessage;
