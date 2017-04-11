@@ -33,14 +33,17 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 //Use Address to check whether or not its a twilio number
                 address = smsMessage.getOriginatingAddress();
 
-                //smsMessageStr += "SMS From: " + address + "\n";
+                //set smsMessageStr
                 smsMessageStr += smsBody;
             }
 
             //only read the sms if it's a verified Data Free number
             if(checkNumbers.isValid(address)) {
-                MainActivity inst = MainActivity.instance();
-                inst.updateInbox(smsMessageStr);
+                //only read if message is in correct format
+                if(checkNumbers.isValidMessage(smsMessageStr)) {
+                    MainActivity inst = MainActivity.instance();
+                    inst.updateInbox(smsMessageStr);
+                }
             }
         }
     }
