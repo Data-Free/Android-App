@@ -24,8 +24,37 @@ public class VerifiedNumbers {
 
     //returns true if input has been formatted properly
     boolean isValidMessage(String input) {
-        //change this to check whether formatting is right -> more flexible
-        if(input.equals("Hello from Twilio!")) {
+        if(checkHeader(input)) {
+            return true;
+        } else if(checkContent(input)) {
+            return true;
+        }
+        return false;
+    }
+
+    //header = {xx...
+    boolean checkHeader(String message) {
+        char[] charArray = message.toCharArray();
+
+        //true if first char is '{' and next two are lowercase
+        if(charArray[0]!='{') {
+            return false;
+        } else if(!Character.isLowerCase(charArray[1])) {
+            return false;
+        } else if(!Character.isLowerCase(charArray[2])) {
+            return false;
+        }
+        return true;
+    }
+
+    //content = xx...
+    boolean checkContent(String message) {
+        char[] charArray = message.toCharArray();
+
+        //true if the first two characters are lowercase letters
+        if(!Character.isLowerCase(charArray[0])) {
+            return false;
+        } else if(!Character.isLowerCase(charArray[1])) {
             return false;
         }
         return true;
