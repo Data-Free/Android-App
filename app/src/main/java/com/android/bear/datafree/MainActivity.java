@@ -2,7 +2,9 @@ package com.android.bear.datafree;
 
 import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -18,6 +20,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -34,26 +41,32 @@ public class MainActivity extends AppCompatActivity {
     String[] messageArray;          //array that stores all incoming sms in proper order
                                     //uses indexKeys to order correctly
 
-    //---- User Input -----!
+    //---- User Input -----
     EditText input;
     String toServer = "";   //final String that gets texted to the server
     String botKey = "aa";   //first 2 chars of toServer to identify which bot requested
 
-    //---- Buttons and User UI -----!
+    //---- Buttons and User UI -----
     Button button0, button1, button2;
     TextView infoBox;           //displays info for currently selected bot
     TextView messageDisplay;    //test variable to display message
 
-    //---- Bot State Machine -----!
+    //---- Bot State Machine -----
     String[] buttonArray;       //stores names of bots so BotFinder.java can use them
     int currentBotIndex = 0;    //which bot is selected in buttonArray
 
-    //---- Classes -----!
+    //---- Word List ----
+    String filePath = "google-10000-english-usa.txt";
+    ArrayList<String> wordList;
+
+
+    //---- Classes -----
     BotFinder botFinder = new BotFinder();  //pass in bot name, get important info
                                             //key, name, info
     KeyConverter keyChange = new KeyConverter();    //performs useful functions on
                                                     //botKeys, indexes
     ArrayHandler arrayHandler = new ArrayHandler(); //useful functions on arrays
+    HuffDecoder huffDecoder = new HuffDecoder();    //decodes sms into regular text
 
 
     //End of declaring variables
@@ -85,6 +98,33 @@ public class MainActivity extends AppCompatActivity {
             //refreshSmsInbox();
         }
 
+        wordList = new ArrayList<String>();
+        //---createWordList---------
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open(filePath)));
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                //process line
+                wordList.add(mLine);
+
+            }
+        } catch (IOException e) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //log the exception
+                }
+            }
+        }
+        //------------
+
         //set up buttonArray
         buttonArray = new String[4];    //length = number of bots
         buttonArray[0] = "suggestions";
@@ -106,46 +146,7 @@ public class MainActivity extends AppCompatActivity {
         updateScreen();
     }
 
-    public void refreshSmsInbox(String smsMessage) {
-        ContentResolver contentResolver = getContentResolver();
-        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
-        int indexBody = smsInboxCursor.getColumnIndex("body");
-        int indexAddress = smsInboxCursor.getColumnIndex("address");
-        if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
-
-        //check whether incoming sms is a header, content, or end sms
-        if(smsMessage.substring(0,1).contains("{")) {
-            //check if it is a header text
-
-            //<Debug tools>
-            //String display = smsMessage.substring(39,41);
-            //display = display + ": " + keyChange.keyToInt(display);
-            //messageDisplay.setText(display);
-
-            //create new array the size of the number of incoming sms packages
-            messageArray = new String[keyChange.keyToInt(smsMessage.substring(1,3))];
-        } else if(smsMessage.substring(0,1).contains("}")) {
-            //for end text
-        } else {
-            //Add message to content string and display it
-            incomingContent = incomingContent +" " + smsMessage;
-            arrayAdapter.clear();
-            arrayAdapter.add(incomingContent);
-
-            //get sms index and use it to put String in proper place
-            int mIndex = keyChange.keyToInt(smsMessage.substring(0,2));
-            messageArray[mIndex] = smsMessage.substring(2);
-
-            if(arrayHandler.checkFull(messageArray)) {
-                messageDisplay.setText(ArrayHandler.createString(messageArray));
-            }
-        }
-    }
-
-    public void updateInbox(String smsMessageStr) {
-        //arrayAdapter.add(smsMessageStr);
-        refreshSmsInbox(smsMessageStr);
-    }
+    //---GET PERMISSIONS----------------------------------------------------------------------------
 
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
@@ -178,6 +179,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    //---UPDATE SCREEN------------------------------------------------------------------------------
+
+
+    public void updateInbox(String smsMessageStr) {
+        //arrayAdapter.add(smsMessageStr);
+        refreshSmsInbox(smsMessageStr);
+    }
+
+    public void updateScreen() {
+        //update bot names
+
+        //update botInfo
+        infoBox.setText(botFinder.getInfo(buttonArray[currentBotIndex]));
+    }
+
+    //---CONCERNING MESSAGES------------------------------------------------------------------------
+
     //Sends SMS to Data Free Server
     public void onSendClick(View view) {
 
@@ -195,13 +214,77 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateScreen() {
-        //update bot names
+    public void refreshSmsInbox(String smsMessage) {
+        ContentResolver contentResolver = getContentResolver();
+        Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
+        int indexBody = smsInboxCursor.getColumnIndex("body");
+        int indexAddress = smsInboxCursor.getColumnIndex("address");
+        if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
 
-        //update botInfo
-        infoBox.setText(botFinder.getInfo(buttonArray[currentBotIndex]));
+        //check whether incoming sms is a header, content, or end sms
+        if(smsMessage.substring(0,1).contains("{")) {
+            //check if it is a header text
+
+            //<Debug tools>
+            //String display = smsMessage.substring(39,41);
+            //display = display + ": " + keyChange.keyToInt(display);
+            //messageDisplay.setText(display);
+
+            //create new array the size of the number of incoming sms packages
+            messageArray = new String[keyChange.keyToInt(smsMessage.substring(1,3))];
+        } else if(smsMessage.substring(0,1).contains("}")) {
+            //for end text
+        } else {
+            //Add message to content string and display it
+            incomingContent = incomingContent + smsMessage;
+            arrayAdapter.clear();
+            arrayAdapter.add(incomingContent);
+
+            //get sms index and use it to put String in proper place
+            int mIndex = keyChange.keyToInt(smsMessage.substring(0,2));
+            String modifiedSMS = smsMessage + " "; // Add back the format space twilio auto deletes
+            String decoded = huffDecoder.decode(modifiedSMS.substring(2), wordList);
+
+            messageArray[mIndex] = decoded;
+
+            if(arrayHandler.checkFull(messageArray)) {
+                messageDisplay.setText(ArrayHandler.createString(messageArray));
+            }
+        }
     }
 
+    //---createWordList-----------------------------------------------------------------------------
+
+    /*
+    public ArrayList<String> createWordList(Context context, String filename) throws IOException {
+        ArrayList<String> wordList = new ArrayList<String>();
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open("filename.txt")));
+
+            // do reading, usually loop until end of file reading
+            String mLine;
+            while ((mLine = reader.readLine()) != null) {
+                //process line
+                wordList.add(mLine);
+            }
+        } catch (IOException e) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //log the exception
+                }
+            }
+        }
+        return wordList;
+    } */
+
+
+    //---BOT BUTTONS--------------------------------------------------------------------------------
     //Change
     public void onClick_B0(View view) {
         currentBotIndex = 0;
