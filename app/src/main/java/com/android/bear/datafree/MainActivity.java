@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
                                                     //botKeys, indexes
     ArrayHandler arrayHandler = new ArrayHandler(); //useful functions on arrays
     HuffDecoder huffDecoder = new HuffDecoder();    //decodes sms into regular text
+    FixSentenceCase fixCapitals = new FixSentenceCase();
 
 
     //End of declaring variables
@@ -248,41 +249,12 @@ public class MainActivity extends AppCompatActivity {
             messageArray[mIndex] = decoded;
 
             if(arrayHandler.checkFull(messageArray)) {
-                messageDisplay.setText(ArrayHandler.createString(messageArray));
+                String fullAnswer = ArrayHandler.createString(messageArray);
+                fullAnswer = fixCapitals.fixCapitalization(fullAnswer);
+                messageDisplay.setText(fullAnswer);
             }
         }
     }
-
-    //---createWordList-----------------------------------------------------------------------------
-
-    /*
-    public ArrayList<String> createWordList(Context context, String filename) throws IOException {
-        ArrayList<String> wordList = new ArrayList<String>();
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("filename.txt")));
-
-            // do reading, usually loop until end of file reading
-            String mLine;
-            while ((mLine = reader.readLine()) != null) {
-                //process line
-                wordList.add(mLine);
-            }
-        } catch (IOException e) {
-            //log the exception
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    //log the exception
-                }
-            }
-        }
-        return wordList;
-    } */
-
 
     //---BOT BUTTONS--------------------------------------------------------------------------------
     //Change
