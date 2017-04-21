@@ -18,6 +18,18 @@ class ArrayHandler {
         return true;
     }
 
+    String findPercentFull(String[] array) {
+        int total = array.length;
+        int filled = 0;
+        for(int i=0; i<array.length; i++) {
+            if(array[i]!=null) {
+                filled++;
+            }
+        }
+        String result = filled + "/" + total;
+        return result;
+    }
+
     //compiles an array into a string
     public static String createString(String[] array) {
         String result = "";

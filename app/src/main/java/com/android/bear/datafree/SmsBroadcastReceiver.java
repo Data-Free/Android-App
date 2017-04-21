@@ -42,7 +42,11 @@ public class SmsBroadcastReceiver extends BroadcastReceiver {
                 //only read if message is in correct format
                 if(checkNumbers.isValidMessage(smsMessageStr)) {
                     MainActivity inst = MainActivity.instance();
-                    inst.updateInbox(smsMessageStr);
+                    inst.updateInbox(smsMessageStr); // send to main activity
+                } else {
+                    //toast
+                    Toast.makeText(context, "Error Text Received", Toast.LENGTH_SHORT).show();
+
                 }
             }
         }

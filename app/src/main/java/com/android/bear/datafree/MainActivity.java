@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
 
     //---UPDATE SCREEN------------------------------------------------------------------------------
 
-
+    // gets called when app receives a new, valid text
     public void updateInbox(String smsMessageStr) {
         //arrayAdapter.add(smsMessageStr);
         refreshSmsInbox(smsMessageStr);
@@ -226,11 +226,6 @@ public class MainActivity extends AppCompatActivity {
         if(smsMessage.substring(0,1).contains("{")) {
             //check if it is a header text
 
-            //<Debug tools>
-            //String display = smsMessage.substring(39,41);
-            //display = display + ": " + keyChange.keyToInt(display);
-            //messageDisplay.setText(display);
-
             //create new array the size of the number of incoming sms packages
             messageArray = new String[keyChange.keyToInt(smsMessage.substring(1,3))];
         } else if(smsMessage.substring(0,1).contains("}")) {
@@ -248,6 +243,10 @@ public class MainActivity extends AppCompatActivity {
 
             messageArray[mIndex] = decoded;
 
+            // display how many messages received/expected messages
+            messageDisplay.setText(arrayHandler.findPercentFull(messageArray));
+
+            // if the entire package has been received, display it
             if(arrayHandler.checkFull(messageArray)) {
                 String fullAnswer = ArrayHandler.createString(messageArray);
                 fullAnswer = fixCapitals.fixCapitalization(fullAnswer);
