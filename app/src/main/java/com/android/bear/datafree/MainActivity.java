@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //send Content Request to Data Free Server
-    public void sendContentRequestText(String botCase, String instance, String content) {
+    public void sendContentRequestText(String botKey, String botCase, String instance, String content) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
@@ -279,14 +279,26 @@ public class MainActivity extends AppCompatActivity {
             String bK = smsMessage.substring(1,3);
             String kS = smsMessage.substring(5,7);
             String request = smsMessage.substring(7);
-            incomingPackages.add(new ContentPackage(bK, kS, request));
 
             String botCase = smsMessage.substring(3,4);
             String instance = smsMessage.substring(4,5);
             String content = smsMessage.substring(7);
 
+            /*
+            // FIX THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // create new package in correct spot
+            if(incomingPackages.size() >= keyChange.keyToInt(instance)) {
+                incomingPackages.add(new ContentPackage(bK, kS, request));
+            } else {
+                incomingPackages.set(keyChange.keyToInt(instance),new ContentPackage(bK, kS, request));
+            }
+*/
+            incomingPackages.add(new ContentPackage(bK, kS, request));
+
+
+
             // send confirmation text
-            sendContentRequestText(botCase, instance, content);
+            sendContentRequestText(bK, botCase, instance, content);
 
         } else {
             //Add message to content string and display it
