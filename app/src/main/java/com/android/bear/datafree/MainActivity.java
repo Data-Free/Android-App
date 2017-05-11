@@ -208,20 +208,38 @@ public class MainActivity extends AppCompatActivity {
             getPermissionToReadSMS();
         } else {
             //Send sms to server
-<<<<<<< HEAD
-            toServer = botKey + input.getText().toString();
-            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
-            Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
-=======
 
-            int instance = incomingPackages.size(); // get an open instance
+            // CREATE INSTANCE
+            int instance;
+
+            //SOMETHING IS FUCKY
+
+
+            // find first non-active package
+            // loop through
+            boolean found = false;
+            int nonActiveIndex = -1;
+            for(int i=nonActiveIndex+1; i<incomingPackages.size() && !found; i++) {
+                if(!incomingPackages.get(i).active) {
+                    found = true;
+                    nonActiveIndex = i;
+                }
+            }
+            if(found) {
+                instance = nonActiveIndex;
+            } else {
+                instance = incomingPackages.size();
+            }
+
+
+            //instance = incomingPackages.size();
+
             String botCase = "c"; // CHANGE THIS
 
             // format: { bk r i ...
             toServer = "{" + botKey + botCase + instance + input.getText().toString();
             smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
             Toast.makeText(this, "Request Declaration sent!", Toast.LENGTH_SHORT).show();
->>>>>>> 6dffe20... Reconfigured Header text protocols for package-loss detection system and
 
             //clear text in Edit text
             input.setText("");
@@ -270,9 +288,6 @@ public class MainActivity extends AppCompatActivity {
             // send confirmation text
             sendContentRequestText(botCase, instance, content);
 
-
-            //Toast.makeText(this, kS, Toast.LENGTH_SHORT).show();
-
         } else {
             //Add message to content string and display it
             // content text = i + si + ...
@@ -284,16 +299,14 @@ public class MainActivity extends AppCompatActivity {
             arrayAdapter.add(incomingContent);
             //----
 
-            //int instance = keyChange.keyToInt(smsMessage.substring(1,3));
+            // add to package
             int instance = Integer.parseInt(smsMessage.substring(0,1));
-
-
             smsMessage += " "; // add back the space that twilio formatting deletes
             incomingPackages.get(instance).addMessage(smsMessage);
             //---------
 
 
-            // display how many messages received/expected messages
+            // display how many received/expected messages
             messageDisplay.setText(arrayHandler.findPercentFull(incomingPackages.get(instance).contents));
 
             // if the entire package has been received, display it
@@ -304,7 +317,8 @@ public class MainActivity extends AppCompatActivity {
                 fullAnswer = fixCapitals.fixCapitalization(fullAnswer);
                 messageDisplay.setText(fullAnswer);
 
-                // delete package from arraylist
+                // set package to be complete
+                incomingPackages.get(instance).complete();
             }
 
 

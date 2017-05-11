@@ -13,12 +13,13 @@ class ContentPackage {
     int botCase, botKey;
     String request;
     String[] contents;
+    boolean active;
 
     ContentPackage(String bK, String kS, String contentRequest) {
         botKey = keyConvert.keyToInt(bK);
         contents = new String[keyConvert.keyToInt(kS)];
         request = contentRequest;
-
+        active = true;
     }
 
     //---addMessage---------------------------------------------------------------------------------
@@ -28,5 +29,12 @@ class ContentPackage {
         // format: i si ... (instance + index + content)
         int index = keyConvert.keyToInt(message.substring(1,3));
         contents[index] = message.substring(3);
+    }
+
+    //---complete-----------------------------------------------------------------------------------
+
+    // call to flag package as inactive
+    void complete() {
+        active = false;
     }
 }
