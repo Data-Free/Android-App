@@ -30,6 +30,9 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    //---DECLARE VARIABLES--------------------------------------------------------------------------
+
     //---- Reading SMS -----!
     static MainActivity inst;
     ArrayList<String> smsMessagesList = new ArrayList<>();
@@ -73,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //End of declaring variables
-    //----------------------------------------------------------------------
+    //----------------------------------------------------------------------------------------------
 
     public static MainActivity instance() {
         return inst;
@@ -207,16 +210,12 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
         } else {
-            //Send sms to server
+            // SEND SMS TO SERVER
 
-            // CREATE INSTANCE
-            int instance;
+            // 1) create packageSlot in a non active package index
+            int packageSlot;
 
-            //SOMETHING IS FUCKY
-
-
-            // find first non-active package
-            // loop through
+            // 2) find first non-active package
             boolean found = false;
             int nonActiveIndex = -1;
             for(int i=nonActiveIndex+1; i<incomingPackages.size() && !found; i++) {
@@ -225,20 +224,20 @@ public class MainActivity extends AppCompatActivity {
                     nonActiveIndex = i;
                 }
             }
+
+            // 3) set packageSlot to empty/non-active spot
             if(found) {
-                instance = nonActiveIndex;
+                packageSlot = nonActiveIndex;
             } else {
-                instance = incomingPackages.size();
+                packageSlot = incomingPackages.size();
             }
 
-
-            //instance = incomingPackages.size();
-
+            // 4) determine bot case from bot
             String botCase = "c"; // CHANGE THIS
 
-            // format: { bk r i ...
-            toServer = "{" + botKey + botCase + instance + input.getText().toString();
-            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
+            // 5) format text: { bk r p ...
+            toServer = "{" + botKey + botCase + packageSlot + input.getText().toString();
+            smsManager.sendTextMessage("+14158020095", null, toServer, null, null);
             Toast.makeText(this, "Request Declaration sent!", Toast.LENGTH_SHORT).show();
 
             //clear text in Edit text
@@ -247,22 +246,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //send Content Request to Data Free Server
-    public void sendContentRequestText(String botKey, String botCase, String instance, String content) {
+    public void sendContentRequestText(String botKey, String botCase, String packageSlot, String content) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
         } else {
-            //Send sms to server
+            // SEND SMS TO SERVER
 
             // format: bk + r + i + ...
+<<<<<<< HEAD
             toServer = botKey + botCase + instance + content;
             smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
+=======
+            toServer = botKey + botCase + packageSlot + content;
+            smsManager.sendTextMessage("+14158020095", null, toServer, null, null);
+>>>>>>> 5eeac3d... Replace "instance" with packageSlot to reduce confusion and increase readability
             Toast.makeText(this, "Content Request sent!", Toast.LENGTH_SHORT).show();
         }
 
     }
 
     // gets called when a new message comes in
+    // puts message in correct package, or creates new package from packageSlot
     public void refreshSmsInbox(String smsMessage) {
         ContentResolver contentResolver = getContentResolver();
         Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
@@ -273,30 +278,31 @@ public class MainActivity extends AppCompatActivity {
         //check whether incoming sms is a header, content
         if(smsMessage.substring(0,1).contains("{")) {
 
-            // declaration text = { + bk + r + i + si + ...
+            // declaration text = { + bk + r + p + si + ...
             //                    0   12   3   4   56
-            // { + botkey + botCase + instance + size
+            // { + botkey + botCase + packageSlot + size
             String bK = smsMessage.substring(1,3);
             String kS = smsMessage.substring(5,7);
             String request = smsMessage.substring(7);
 
             String botCase = smsMessage.substring(3,4);
-            String instance = smsMessage.substring(4,5);
+            String packageSlot = smsMessage.substring(4,5);
             String content = smsMessage.substring(7);
 
 
             // create new package in correct spot
-            if(incomingPackages.size() <= Integer.parseInt(instance)) {
+            if(incomingPackages.size() <= Integer.parseInt(packageSlot)) {
                 incomingPackages.add(new ContentPackage(bK, kS, request));
             } else {
-                incomingPackages.set(Integer.parseInt(instance), new ContentPackage(bK, kS, request));
+                incomingPackages.set(Integer.parseInt(packageSlot), new ContentPackage(bK, kS, request));
             }
 
             // send confirmation text
-            sendContentRequestText(bK, botCase, instance, content);
+            sendContentRequestText(bK, botCase, packageSlot, content);
 
         } else {
             //Add message to content string and display it
+
             // content text = i + si + ...
             //                0 + 12 + ...
 
@@ -307,25 +313,26 @@ public class MainActivity extends AppCompatActivity {
             //----
 
             // add to package
-            int instance = Integer.parseInt(smsMessage.substring(0,1));
+            int packageSlot = Integer.parseInt(smsMessage.substring(0,1));
             smsMessage += " "; // add back the space that twilio formatting deletes
-            incomingPackages.get(instance).addMessage(smsMessage);
+            incomingPackages.get(packageSlot).addMessage(smsMessage);
             //---------
 
 
             // display how many received/expected messages
-            messageDisplay.setText(arrayHandler.findPercentFull(incomingPackages.get(instance).contents));
+            messageDisplay.setText(arrayHandler.findPercentFull(incomingPackages.get(packageSlot).contents));
 
             // if the entire package has been received, display it
-            if(arrayHandler.checkFull(incomingPackages.get(instance).contents)) {
+            if(arrayHandler.checkFull(incomingPackages.get(packageSlot).contents)) {
 
-                String fullAnswer = ArrayHandler.createString(incomingPackages.get(instance).contents);
+                String fullAnswer = ArrayHandler.createString(incomingPackages.get(packageSlot).contents);
+
                 fullAnswer = huffDecoder.decode(fullAnswer, wordList);
                 fullAnswer = fixCapitals.fixCapitalization(fullAnswer);
                 messageDisplay.setText(fullAnswer);
 
                 // set package to be complete
-                incomingPackages.get(instance).complete();
+                incomingPackages.get(packageSlot).complete();
             }
 
 
@@ -348,5 +355,11 @@ public class MainActivity extends AppCompatActivity {
         currentBotIndex = 2;
         botKey = botFinder.getKey(buttonArray[2]);
         updateScreen();
+    }
+
+    //---UTILITIES----------------------------------------------------------------------------------
+
+    public void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
