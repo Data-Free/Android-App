@@ -284,18 +284,13 @@ public class MainActivity extends AppCompatActivity {
             String instance = smsMessage.substring(4,5);
             String content = smsMessage.substring(7);
 
-            /*
-            // FIX THIS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
             // create new package in correct spot
-            if(incomingPackages.size() >= keyChange.keyToInt(instance)) {
+            if(incomingPackages.size() <= Integer.parseInt(instance)) {
                 incomingPackages.add(new ContentPackage(bK, kS, request));
             } else {
-                incomingPackages.set(keyChange.keyToInt(instance),new ContentPackage(bK, kS, request));
+                incomingPackages.set(Integer.parseInt(instance), new ContentPackage(bK, kS, request));
             }
-*/
-            incomingPackages.add(new ContentPackage(bK, kS, request));
-
-
 
             // send confirmation text
             sendContentRequestText(bK, botCase, instance, content);
