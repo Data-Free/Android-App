@@ -24,38 +24,45 @@ public class VerifiedNumbers {
 
     //returns true if input has been formatted properly
     boolean isValidMessage(String input) {
-        if(checkHeader(input)) {
-            return true;
-        } else if(checkContent(input)) {
-            return true;
-        }
-        return false;
+        return (checkHeader(input) || checkContent(input));
     }
 
     //header = {xx...
+    // { bk r i si ...
     boolean checkHeader(String message) {
         char[] charArray = message.toCharArray();
 
         //true if first char is '{' and next two are lowercase
         if(charArray[0]!='{') {
-            return false;
+            return false; // {                                  // {
         } else if(!Character.isLowerCase(charArray[1])) {
-            return false;
+            return false; // botkey                             // a
         } else if(!Character.isLowerCase(charArray[2])) {
-            return false;
+            return false; // botkey                             // d
+        } else if(!Character.isLetter(charArray[3])) {
+            return false; // botCase                            // c
+        } else if(!Character.isDigit(charArray[4])) {
+            return false; // instance                           // a
+        } else if(!Character.isLetter(charArray[5])) {
+            return false; // size                               // b
+        } else if(!Character.isLetter(charArray[6])) {
+            return false; // size                               // 0
         }
         return true;
     }
 
     //content = xx...
+    // i si ...
     boolean checkContent(String message) {
         char[] charArray = message.toCharArray();
 
         //true if the first two characters are lowercase letters
-        if(!Character.isLowerCase(charArray[0])) {
-            return false;
+        if(!Character.isDigit(charArray[0])) {
+            return false; // instance
         } else if(!Character.isLowerCase(charArray[1])) {
-            return false;
+            return false; // index
+        } else if(!Character.isLowerCase(charArray[2])) {
+            return false; // index
         }
         return true;
     }

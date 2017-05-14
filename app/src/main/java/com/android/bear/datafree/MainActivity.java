@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
     String[] messageArray;          //array that stores all incoming sms in proper order
                                     //uses indexKeys to order correctly
 
+    ArrayList<ContentPackage> incomingPackages = new ArrayList<ContentPackage>();
+
     //---- User Input -----
     EditText input;
     String toServer = "";   //final String that gets texted to the server
@@ -198,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
 
     //---CONCERNING MESSAGES------------------------------------------------------------------------
 
-    //Sends SMS to Data Free Server
+    //Sends SMS Declaration Request to Data Free Server
     public void onSendClick(View view) {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
@@ -206,15 +208,43 @@ public class MainActivity extends AppCompatActivity {
             getPermissionToReadSMS();
         } else {
             //Send sms to server
+<<<<<<< HEAD
             toServer = botKey + input.getText().toString();
             smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
             Toast.makeText(this, "Message sent!", Toast.LENGTH_SHORT).show();
+=======
+
+            int instance = incomingPackages.size(); // get an open instance
+            String botCase = "c"; // CHANGE THIS
+
+            // format: { bk r i ...
+            toServer = "{" + botKey + botCase + instance + input.getText().toString();
+            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
+            Toast.makeText(this, "Request Declaration sent!", Toast.LENGTH_SHORT).show();
+>>>>>>> 6dffe20... Reconfigured Header text protocols for package-loss detection system and
 
             //clear text in Edit text
             input.setText("");
         }
     }
 
+    //send Content Request to Data Free Server
+    public void sendContentRequestText(String botCase, String instance, String content) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)
+                != PackageManager.PERMISSION_GRANTED) {
+            getPermissionToReadSMS();
+        } else {
+            //Send sms to server
+
+            // format: bk + r + i + ...
+            toServer = botKey + botCase + instance + content;
+            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
+            Toast.makeText(this, "Content Request sent!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    // gets called when a new message comes in
     public void refreshSmsInbox(String smsMessage) {
         ContentResolver contentResolver = getContentResolver();
         Cursor smsInboxCursor = contentResolver.query(Uri.parse("content://sms/inbox"), null, null, null, null);
@@ -222,36 +252,62 @@ public class MainActivity extends AppCompatActivity {
         int indexAddress = smsInboxCursor.getColumnIndex("address");
         if (indexBody < 0 || !smsInboxCursor.moveToFirst()) return;
 
-        //check whether incoming sms is a header, content, or end sms
+        //check whether incoming sms is a header, content
         if(smsMessage.substring(0,1).contains("{")) {
-            //check if it is a header text
 
-            //create new array the size of the number of incoming sms packages
-            messageArray = new String[keyChange.keyToInt(smsMessage.substring(1,3))];
-        } else if(smsMessage.substring(0,1).contains("}")) {
-            //for end text
+            // declaration text = { + bk + r + i + si + ...
+            //                    0   12   3   4   56
+            // { + botkey + botCase + instance + size
+            String bK = smsMessage.substring(1,3);
+            String kS = smsMessage.substring(5,7);
+            String request = smsMessage.substring(7);
+            incomingPackages.add(new ContentPackage(bK, kS, request));
+
+            String botCase = smsMessage.substring(3,4);
+            String instance = smsMessage.substring(4,5);
+            String content = smsMessage.substring(7);
+
+            // send confirmation text
+            sendContentRequestText(botCase, instance, content);
+
+
+            //Toast.makeText(this, kS, Toast.LENGTH_SHORT).show();
+
         } else {
             //Add message to content string and display it
+            // content text = i + si + ...
+            //                0 + 12 + ...
+
+            //---add to screen for debug----
             incomingContent = incomingContent + smsMessage;
             arrayAdapter.clear();
             arrayAdapter.add(incomingContent);
+            //----
 
-            //get sms index and use it to put String in proper place
-            int mIndex = keyChange.keyToInt(smsMessage.substring(0,2));
-            String modifiedSMS = smsMessage + " "; // Add back the format space twilio auto deletes
-            String decoded = huffDecoder.decode(modifiedSMS.substring(2), wordList);
+            //int instance = keyChange.keyToInt(smsMessage.substring(1,3));
+            int instance = Integer.parseInt(smsMessage.substring(0,1));
 
-            messageArray[mIndex] = decoded;
+
+            smsMessage += " "; // add back the space that twilio formatting deletes
+            incomingPackages.get(instance).addMessage(smsMessage);
+            //---------
+
 
             // display how many messages received/expected messages
-            messageDisplay.setText(arrayHandler.findPercentFull(messageArray));
+            messageDisplay.setText(arrayHandler.findPercentFull(incomingPackages.get(instance).contents));
 
             // if the entire package has been received, display it
-            if(arrayHandler.checkFull(messageArray)) {
-                String fullAnswer = ArrayHandler.createString(messageArray);
+            if(arrayHandler.checkFull(incomingPackages.get(instance).contents)) {
+
+                String fullAnswer = ArrayHandler.createString(incomingPackages.get(instance).contents);
+                fullAnswer = huffDecoder.decode(fullAnswer, wordList);
                 fullAnswer = fixCapitals.fixCapitalization(fullAnswer);
                 messageDisplay.setText(fullAnswer);
+
+                // delete package from arraylist
             }
+
+
         }
     }
 
