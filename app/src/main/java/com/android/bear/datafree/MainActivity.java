@@ -4,12 +4,15 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.SharedPreferencesCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -50,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     String incomingContent = "";    //stores incoming sms from server
     String[] messageArray;          //array that stores all incoming sms in proper order
                                     //uses indexKeys to order correctly
-
     String serverNumber = "";
     ArrayList<ContentPackage> incomingPackages = new ArrayList<ContentPackage>();
 
@@ -164,6 +166,13 @@ public class MainActivity extends AppCompatActivity {
         button1.setText(botFinder.getName(buttonArray[1]));
         button2.setText(botFinder.getName(buttonArray[2]));
 
+        //---- Memory ----
+        SharedPreferences memory = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // set up server Number
+        serverNumber = memory.getString("serverNumber", "");
+        verifiedNumbers.setServerNumber(serverNumber, this);
+
         updateScreen();
     }
 
@@ -206,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.add_number:
-                createPopUp(this, 0, "Add a new server phone number", "5551119999");
+                createPopUp(this, 0, "New Server Number\ncurrent: " + serverNumber, "5551119999");
                 return true;
         }
         return false;
@@ -384,14 +393,16 @@ public class MainActivity extends AppCompatActivity {
         updateScreen();
     }
 
-    //---UTILITIES----------------------------------------------------------------------------------
+    //---Memory-------------------------------------------------------------------------------------
 
-    public void toast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    // saves a value to memory at label
+    public void saveToMemory(String label, String value) {
+        SharedPreferences memory = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editMemory = memory.edit();
+        editMemory.putString(label, value).apply();
     }
 
-
-    // creates a pop up
+    // creates a pop up, commits answer to memory
     public void createPopUp(final Context context, int action, String message, String hint) {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
@@ -409,9 +420,16 @@ public class MainActivity extends AppCompatActivity {
         if(action == 0) {
             alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    serverNumber = "+1" + et.getText().toString();
-                    verifiedNumbers.setServerNumber(serverNumber, context);
-                    toast(verifiedNumbers.getNumber());
+                    // check if number is valid
+                    if(("+1" + et.getText().toString()).length() == 12) {
+                        serverNumber = "+1" + et.getText().toString();
+                        verifiedNumbers.setServerNumber(serverNumber, context);
+                        saveToMemory("serverNumber", serverNumber);
+                        toast(verifiedNumbers.getNumber());
+                    } else {
+                        toast("Number not added");
+                    }
+
                 }
             });
         }
@@ -422,4 +440,12 @@ public class MainActivity extends AppCompatActivity {
         // show it
         alertDialog.show();
     }
+
+
+    //---UTILITIES----------------------------------------------------------------------------------
+
+    public void toast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
 }
