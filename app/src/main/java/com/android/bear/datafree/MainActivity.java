@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     String[] messageArray;          //array that stores all incoming sms in proper order
                                     //uses indexKeys to order correctly
 
-    String serverNumber;
+    String serverNumber = "";
     ArrayList<ContentPackage> incomingPackages = new ArrayList<ContentPackage>();
 
     //---- User Input -----
@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayHandler arrayHandler = new ArrayHandler(); //useful functions on arrays
     HuffDecoder huffDecoder = new HuffDecoder();    //decodes sms into regular text
     FixSentenceCase fixCapitals = new FixSentenceCase();
+    VerifiedNumbersSingleton verifiedNumbers = VerifiedNumbersSingleton.getInstance();
 
 
     //---ON START-----------------------------------------------------------------------------------
@@ -237,36 +238,42 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // SEND SMS TO SERVER
 
-            // 1) create packageSlot in a non active package index
-            int packageSlot;
+            // only try to send if serverNumber is a real number
+            if(serverNumber.length() == 12) {
+                // 1) create packageSlot in a non active package index
+                int packageSlot;
 
-            // 2) find first non-active package
-            boolean found = false;
-            int nonActiveIndex = -1;
-            for(int i=nonActiveIndex+1; i<incomingPackages.size() && !found; i++) {
-                if(!incomingPackages.get(i).active) {
-                    found = true;
-                    nonActiveIndex = i;
+                // 2) find first non-active package
+                boolean found = false;
+                int nonActiveIndex = -1;
+                for (int i = nonActiveIndex + 1; i < incomingPackages.size() && !found; i++) {
+                    if (!incomingPackages.get(i).active) {
+                        found = true;
+                        nonActiveIndex = i;
+                    }
                 }
-            }
 
-            // 3) set packageSlot to empty/non-active spot
-            if(found) {
-                packageSlot = nonActiveIndex;
+                // 3) set packageSlot to empty/non-active spot
+                if (found) {
+                    packageSlot = nonActiveIndex;
+                } else {
+                    packageSlot = incomingPackages.size();
+                }
+
+                // 4) determine bot case from bot
+                String botCase = "c"; // CHANGE THIS
+
+                // 5) format text: { bk r p ...
+                toServer = "{" + botKey + botCase + packageSlot + input.getText().toString();
+
+                smsManager.sendTextMessage(serverNumber, null, toServer, null, null);
+                Toast.makeText(this, "Request Declaration sent!", Toast.LENGTH_SHORT).show();
+
+                //clear text in Edit text
+                input.setText("");
             } else {
-                packageSlot = incomingPackages.size();
+                toast("Please input a server number!");
             }
-
-            // 4) determine bot case from bot
-            String botCase = "c"; // CHANGE THIS
-
-            // 5) format text: { bk r p ...
-            toServer = "{" + botKey + botCase + packageSlot + input.getText().toString();
-            smsManager.sendTextMessage("+14158020095", null, toServer, null, null);
-            Toast.makeText(this, "Request Declaration sent!", Toast.LENGTH_SHORT).show();
-
-            //clear text in Edit text
-            input.setText("");
         }
     }
 
@@ -280,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
             // format: bk + r + i + ...
             toServer = botKey + botCase + packageSlot + content;
-            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
+            smsManager.sendTextMessage(serverNumber, null, toServer, null, null);
             Toast.makeText(this, "Content Request sent!", Toast.LENGTH_SHORT).show();
         }
 
@@ -385,7 +392,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     // creates a pop up
-    public void createPopUp(Context context, int action, String message, String hint) {
+    public void createPopUp(final Context context, int action, String message, String hint) {
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
 
@@ -403,7 +410,8 @@ public class MainActivity extends AppCompatActivity {
             alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     serverNumber = "+1" + et.getText().toString();
-                    toast(serverNumber);
+                    verifiedNumbers.setServerNumber(serverNumber, context);
+                    toast(verifiedNumbers.getNumber());
                 }
             });
         }

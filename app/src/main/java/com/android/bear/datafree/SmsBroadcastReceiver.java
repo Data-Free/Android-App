@@ -13,12 +13,10 @@ import android.widget.Toast;
 public class SmsBroadcastReceiver extends BroadcastReceiver {
 
     public static final String SMS_BUNDLE = "pdus";
-    public VerifiedNumbers checkNumbers = new VerifiedNumbers();
+    public VerifiedNumbersSingleton checkNumbers = VerifiedNumbersSingleton.getInstance();
 
     public void onReceive(Context context, Intent intent) {
         Bundle intentExtras = intent.getExtras();
-
-        //Toast.makeText(context, "Message Received!", Toast.LENGTH_SHORT).show();
 
         if (intentExtras != null) {
             Object[] sms = (Object[]) intentExtras.get(SMS_BUNDLE);

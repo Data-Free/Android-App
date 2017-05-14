@@ -4,22 +4,45 @@ import android.content.Context;
 import android.widget.Toast;
 
 /**
- * Created by bear on 4/10/17.
+ * Created by bear on 5/13/17.
  */
 
-public class VerifiedNumbers {
 
-    static String[] numbers = new String[1];
+class VerifiedNumbersSingleton {
 
-    VerifiedNumbers() {}
+    private static VerifiedNumbersSingleton instance = null;
+    private String serverNumber; // have this be determined from memory
 
-    //Determine whether a number is valid
-    boolean isValid(String input) {
-        switch(input) {
-            case "+15555555555":
-                return true;
+    private VerifiedNumbersSingleton() {
+        // Exists only to defeat instantiation.
+    }
+
+    static VerifiedNumbersSingleton getInstance() {
+        if(instance == null) {
+            instance = new VerifiedNumbersSingleton();
         }
-        return false;
+        return instance;
+    }
+
+    //---Managing Number----------------------------------------------------------------------------
+
+    void setServerNumber(String newNum, Context context) {
+        if(newNum.length() == 12) {
+            serverNumber = newNum;
+        } else {
+            Toast.makeText(context, "Please input proper number", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    String getNumber() {
+        return serverNumber;
+    }
+
+    //---Validity Checks----------------------------------------------------------------------------
+
+    // returns true if input string is from the right number
+    boolean isValid(String input) {
+        return (serverNumber.equals(input));
     }
 
     //returns true if input has been formatted properly
