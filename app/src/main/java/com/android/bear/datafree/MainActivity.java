@@ -3,15 +3,20 @@ package com.android.bear.datafree;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -19,6 +24,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     String[] messageArray;          //array that stores all incoming sms in proper order
                                     //uses indexKeys to order correctly
 
+    String serverNumber;
     ArrayList<ContentPackage> incomingPackages = new ArrayList<ContentPackage>();
 
     //---- User Input -----
@@ -75,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
     FixSentenceCase fixCapitals = new FixSentenceCase();
 
 
-    //End of declaring variables
-    //----------------------------------------------------------------------------------------------
+    //---ON START-----------------------------------------------------------------------------------
 
     public static MainActivity instance() {
         return inst;
@@ -86,6 +93,13 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         inst = this;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.activity_main, menu);
+        return true;
     }
 
     @Override
@@ -185,6 +199,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //---MENU BUTTONS-------------------------------------------------------------------------------
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.add_number:
+                createPopUp(this, 0, "Add a new server phone number", "5551119999");
+                return true;
+        }
+        return false;
+    }
 
     //---UPDATE SCREEN------------------------------------------------------------------------------
 
@@ -254,13 +279,8 @@ public class MainActivity extends AppCompatActivity {
             // SEND SMS TO SERVER
 
             // format: bk + r + i + ...
-<<<<<<< HEAD
-            toServer = botKey + botCase + instance + content;
-            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
-=======
             toServer = botKey + botCase + packageSlot + content;
-            smsManager.sendTextMessage("+14158020095", null, toServer, null, null);
->>>>>>> 5eeac3d... Replace "instance" with packageSlot to reduce confusion and increase readability
+            smsManager.sendTextMessage("+15555555555", null, toServer, null, null);
             Toast.makeText(this, "Content Request sent!", Toast.LENGTH_SHORT).show();
         }
 
@@ -361,5 +381,37 @@ public class MainActivity extends AppCompatActivity {
 
     public void toast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+
+    // creates a pop up
+    public void createPopUp(Context context, int action, String message, String hint) {
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        //final TextView prompt = new TextView(context);
+        //prompt.setText(message);
+        final EditText et = new EditText(context);
+        et.setHint(hint);
+
+        // set prompts.xml to alertdialog builder
+        alertDialogBuilder.setView(et);
+        alertDialogBuilder.setTitle(message);
+        // set dialog message
+
+        if(action == 0) {
+            alertDialogBuilder.setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    serverNumber = "+1" + et.getText().toString();
+                    toast(serverNumber);
+                }
+            });
+        }
+
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
     }
 }

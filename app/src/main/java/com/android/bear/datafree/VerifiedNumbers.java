@@ -34,19 +34,19 @@ public class VerifiedNumbers {
 
         //true if first char is '{' and next two are lowercase
         if(charArray[0]!='{') {
-            return false; // {                                  // {
+            return false; // {
         } else if(!Character.isLowerCase(charArray[1])) {
-            return false; // botkey                             // a
+            return false; // botkey
         } else if(!Character.isLowerCase(charArray[2])) {
-            return false; // botkey                             // d
+            return false; // botkey
         } else if(!Character.isLetter(charArray[3])) {
-            return false; // botCase                            // c
+            return false; // botCase
         } else if(!Character.isDigit(charArray[4])) {
-            return false; // instance                           // a
+            return false; // instance
         } else if(!Character.isLetter(charArray[5])) {
-            return false; // size                               // b
+            return false; // size
         } else if(!Character.isLetter(charArray[6])) {
-            return false; // size                               // 0
+            return false; // size
         }
         return true;
     }
