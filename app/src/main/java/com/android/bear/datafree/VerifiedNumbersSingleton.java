@@ -1,6 +1,8 @@
 package com.android.bear.datafree;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 /**
@@ -27,7 +29,7 @@ class VerifiedNumbersSingleton {
     //---Managing Number----------------------------------------------------------------------------
 
     void setServerNumber(String newNum, Context context) {
-        if(newNum.length() == 12) {
+        if(newNum.length() == 12) { // 12 = "+15551119999"
             serverNumber = newNum;
         } else {
             Toast.makeText(context, "Please input proper number", Toast.LENGTH_LONG).show();
@@ -42,7 +44,7 @@ class VerifiedNumbersSingleton {
 
     // returns true if input string is from the right number
     boolean isValid(String input) {
-        return (serverNumber.equals(input));
+        return (serverNumber != null && serverNumber.equals(input));
     }
 
     //returns true if input has been formatted properly
