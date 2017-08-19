@@ -38,6 +38,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onClick_B0"
+                    android:backgroundTint="@color/colorAccent"
+                    android:textColor="@color/white"
                     android:text="b0" />
 
                 <Button
@@ -46,6 +48,8 @@
                     android:layout_height="wrap_content"
                     android:text="b1"
                     android:onClick="onClick_B1"
+                    android:backgroundTint="@color/lightGray"
+                    android:textColor="@color/darkGray"
                     android:id="@+id/bot_button1" />
 
                 <Button
@@ -54,6 +58,8 @@
                     android:layout_height="wrap_content"
                     android:text="b2"
                     android:onClick="onClick_B2"
+                    android:backgroundTint="@color/lightGray"
+                    android:textColor="@color/darkGray"
                     android:id="@+id/bot_button2" />
 
                 <Button
@@ -61,6 +67,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="New Button"
+                    android:backgroundTint="@color/lightGray"
+                    android:textColor="@color/darkGray"
                     android:id="@+id/button" />
 
                 <Button
@@ -68,6 +76,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="New Button"
+                    android:backgroundTint="@color/lightGray"
+                    android:textColor="@color/darkGray"
                     android:id="@+id/button2" />
 
             </LinearLayout>
@@ -113,7 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:hint="Type message"
+                android:hint="Type Request"
                 android:layout_weight="1" />
 
             <Button
@@ -122,6 +132,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:onClick="onSendClick"
+                android:backgroundTint="@color/darkGray"
+                android:textColor="@android:color/white"
                 android:text="Send" />
         </LinearLayout>
     </LinearLayout>

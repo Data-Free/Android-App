@@ -3,7 +3,13 @@
     <color name="colorPrimary">#e24141</color>          <!-- red -->
     <color name="colorPrimaryDark">#262626</color>      <!-- dark gray -->
     <color name="colorAccent">#e24141</color>
+    <color name="backgroundColor">#f4f4f4</color>       <!-- super light gray -->
 
-    <color name="backgroundColor">#f4f4f4</color>       <!-- Light Gray -->
+    <color name="white">#ffffff</color>
     <color name="lightGray">#c6c6c6</color>
+    <color name="mediumGray">#a8a8a8</color>
+    <color name="darkGray">#3d3d3d</color>
+
+
+    <color name="darkRed">#b83737</color>
 </resources>

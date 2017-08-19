@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.database.Cursor;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -17,6 +19,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -62,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
     String botKey = "aa";   //first 2 chars of toServer to identify which bot requested
 
     //---- Buttons and User UI -----
+    Button sendButton;
     Button button0, button1, button2;
     TextView infoBox;           //displays info for currently selected bot
     TextView messageDisplay;    //test variable to display message
@@ -155,11 +160,31 @@ public class MainActivity extends AppCompatActivity {
         buttonArray[2] = "urban_dic";
 
         //set up buttons
+        sendButton = (Button) findViewById(R.id.send);
         button0 = (Button) findViewById(R.id.bot_button0);
         button1 = (Button) findViewById(R.id.bot_button1);
         button2 = (Button) findViewById(R.id.bot_button2);
         infoBox = (TextView) findViewById(R.id.infoBox);
         messageDisplay = (TextView) findViewById(R.id.messageDisplay);
+
+        //---
+
+        input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateScreen();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         //set up button names
         button0.setText(botFinder.getName(buttonArray[0]));
@@ -234,7 +259,18 @@ public class MainActivity extends AppCompatActivity {
 
         //update botInfo
         infoBox.setText(botFinder.getInfo(buttonArray[currentBotIndex]));
+
+
+        // update send button color
+        if (input.getText().toString().length() > 0) {
+            sendButton.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+        } else {
+            sendButton.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.darkGray), PorterDuff.Mode.MULTIPLY);
+
+        }
     }
+
+
 
     //---CONCERNING MESSAGES------------------------------------------------------------------------
 
@@ -245,6 +281,12 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
         } else {
+
+            // check if there is anything to send
+            if (input.getText().toString().length() < 1) {
+                return;
+            }
+
             // SEND SMS TO SERVER
 
             // only try to send if serverNumber is a real number
@@ -380,17 +422,45 @@ public class MainActivity extends AppCompatActivity {
     public void onClick_B0(View view) {
         currentBotIndex = 0;
         botKey = botFinder.getKey(buttonArray[0]);
+
+        // set button colors
+        deselectButtonColors();
+        button0.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+        button0.setTextColor(ContextCompat.getColor(this, R.color.white));
         updateScreen();
     }
     public void onClick_B1(View view) {
         currentBotIndex = 1;
         botKey = botFinder.getKey(buttonArray[1]);
+
+        // set button colors
+        deselectButtonColors();
+        button1.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+        button1.setTextColor(ContextCompat.getColor(this, R.color.white));
         updateScreen();
     }
     public void onClick_B2(View view) {
         currentBotIndex = 2;
         botKey = botFinder.getKey(buttonArray[2]);
+
+        // set button colors
+        deselectButtonColors();
+        button2.setTextColor(ContextCompat.getColor(this, R.color.white));
+        button2.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
         updateScreen();
+    }
+
+    public void deselectButtonColors() {
+        button0.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
+        button0.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
+
+        button1.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
+        button1.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
+
+
+        button2.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
+        button2.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
+
     }
 
     //---Memory-------------------------------------------------------------------------------------
