@@ -15,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.SharedPreferencesCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -170,10 +172,6 @@ public class MainActivity extends AppCompatActivity {
         //---
 
         input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -181,9 +179,10 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
 
-            }
         });
 
         //set up button names
@@ -197,6 +196,26 @@ public class MainActivity extends AppCompatActivity {
         // set up server Number
         serverNumber = memory.getString("serverNumber", "");
         verifiedNumbers.setServerNumber(serverNumber, this);
+
+
+
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+        Button myButton = new Button(this);
+        myButton.setText("Add Me");
+        myButton.setTag(1);
+
+        LinearLayout ll = (LinearLayout)findViewById(R.id.bot_button_layout);
+        ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+        ll.addView(myButton, lp);
+
+        myButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                toast("hello: " + v.getTag());
+            }
+        });
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 
         updateScreen();
     }

@@ -28,6 +28,7 @@
             android:id="@+id/horizontalScrollView" >
 
             <LinearLayout
+                android:id="@+id/bot_button_layout"
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
@@ -43,14 +44,14 @@
                     android:text="b0" />
 
                 <Button
+                    android:id="@+id/bot_button1"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="b1"
-                    android:onClick="onClick_B1"
                     android:backgroundTint="@color/lightGray"
-                    android:textColor="@color/darkGray"
-                    android:id="@+id/bot_button1" />
+                    android:onClick="onClick_B1"
+                    android:text="b1"
+                    android:textColor="@color/darkGray" />
 
                 <Button
                     style="?android:attr/buttonStyleSmall"
