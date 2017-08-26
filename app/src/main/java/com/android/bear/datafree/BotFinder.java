@@ -50,12 +50,20 @@ class BotFinder {
                 result = "Ever wonder what something really means?\nFind " +
                         "out now on urban dictionary!";
                 break;
+
+            default:
+                result = "404: Not Found";
+                break;
         }
         return result;
     }
 
     String getName(String name) {
         String result = "";
+
+        if (name == null) {
+            name = "test";
+        }
         switch(name) {
             case "tutorial":
                 result = "Tutorial";
@@ -71,6 +79,9 @@ class BotFinder {
                 break;
             case "urban_dic":
                 result = "Urban Dic";
+                break;
+            default:
+                result = "404: Not Found";
                 break;
         }
         return result;

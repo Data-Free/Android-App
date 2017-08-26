@@ -69,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     //---- Buttons and User UI -----
     Button sendButton;
-    Button button0, button1, button2;
+    //Button button0, button1, button2;
+    Button[] botButtons;
     TextView infoBox;           //displays info for currently selected bot
     TextView messageDisplay;    //test variable to display message
 
@@ -163,9 +164,13 @@ public class MainActivity extends AppCompatActivity {
 
         //set up buttons
         sendButton = (Button) findViewById(R.id.send);
+
+        botButtons = createBotButtons(4);
+        /*
         button0 = (Button) findViewById(R.id.bot_button0);
         button1 = (Button) findViewById(R.id.bot_button1);
         button2 = (Button) findViewById(R.id.bot_button2);
+        */
         infoBox = (TextView) findViewById(R.id.infoBox);
         messageDisplay = (TextView) findViewById(R.id.messageDisplay);
 
@@ -185,10 +190,12 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
+        /*
         //set up button names
         button0.setText(botFinder.getName(buttonArray[0]));
         button1.setText(botFinder.getName(buttonArray[1]));
         button2.setText(botFinder.getName(buttonArray[2]));
+        */
 
         //---- Memory ----
         SharedPreferences memory = PreferenceManager.getDefaultSharedPreferences(this);
@@ -196,25 +203,6 @@ public class MainActivity extends AppCompatActivity {
         // set up server Number
         serverNumber = memory.getString("serverNumber", "");
         verifiedNumbers.setServerNumber(serverNumber, this);
-
-
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-        Button myButton = new Button(this);
-        myButton.setText("Add Me");
-        myButton.setTag(1);
-
-        LinearLayout ll = (LinearLayout)findViewById(R.id.bot_button_layout);
-        ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
-        ll.addView(myButton, lp);
-
-        myButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Perform action on click
-                toast("hello: " + v.getTag());
-            }
-        });
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
         updateScreen();
@@ -437,6 +425,58 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //---BOT BUTTONS--------------------------------------------------------------------------------
+
+
+    // createBotButtons
+    public Button[] createBotButtons(int numberOfButtons) {
+
+        Button[] botButtons = new Button[numberOfButtons];
+
+        // loop through and create buttons
+        for (int i = 0; i < numberOfButtons; i++) {
+
+            // create Button
+            final Button newButton = new Button(this);
+            newButton.setText(botFinder.getName(buttonArray[i]));
+            newButton.setTag(i);
+
+            // assign button to proper view
+            LinearLayout ll = (LinearLayout) findViewById(R.id.bot_button_layout);
+            ActionBar.LayoutParams lp = new ActionBar.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT);
+            ll.addView(newButton, lp);
+
+
+            // add on click functionality
+            newButton.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+                    // select correct bot
+                    int tag = Integer.parseInt(v.getTag().toString());
+                    currentBotIndex = tag;
+                    botKey = botFinder.getKey(buttonArray[currentBotIndex]);
+
+                    // assign button colors
+                    updateButtonColors(newButton);
+                }
+            });
+
+
+            // add button to botButtons
+            botButtons[i] = newButton;
+        }
+        return botButtons;
+    }
+
+    //
+    public void updateButtonColors(Button b) {
+        deselectButtonColors(botButtons);
+        b.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
+        b.setTextColor(ContextCompat.getColor(this, R.color.white));
+        updateScreen();
+    }
+
+
+    /*
     //Change
     public void onClick_B0(View view) {
         currentBotIndex = 0;
@@ -480,6 +520,17 @@ public class MainActivity extends AppCompatActivity {
         button2.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
         button2.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
 
+    }
+    */
+
+    // deselect button colors
+    public void deselectButtonColors(Button[] buttons) {
+
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i].getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
+            buttons[i].setTextColor(ContextCompat.getColor(this, R.color.darkGray));
+
+        }
     }
 
     //---Memory-------------------------------------------------------------------------------------
