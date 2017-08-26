@@ -157,20 +157,14 @@ public class MainActivity extends AppCompatActivity {
         //------------
 
         //set up buttonArray
-        buttonArray = new String[4];    //length = number of bots
+        buttonArray = new String[5];    //length = number of bots
         buttonArray[0] = "suggestions";
         buttonArray[1] = "wikipedia";
         buttonArray[2] = "urban_dic";
 
         //set up buttons
         sendButton = (Button) findViewById(R.id.send);
-
-        botButtons = createBotButtons(4);
-        /*
-        button0 = (Button) findViewById(R.id.bot_button0);
-        button1 = (Button) findViewById(R.id.bot_button1);
-        button2 = (Button) findViewById(R.id.bot_button2);
-        */
+        botButtons = createBotButtons(5);
         infoBox = (TextView) findViewById(R.id.infoBox);
         messageDisplay = (TextView) findViewById(R.id.messageDisplay);
 
@@ -189,13 +183,6 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
 
         });
-
-        /*
-        //set up button names
-        button0.setText(botFinder.getName(buttonArray[0]));
-        button1.setText(botFinder.getName(buttonArray[1]));
-        button2.setText(botFinder.getName(buttonArray[2]));
-        */
 
         //---- Memory ----
         SharedPreferences memory = PreferenceManager.getDefaultSharedPreferences(this);
@@ -475,53 +462,6 @@ public class MainActivity extends AppCompatActivity {
         updateScreen();
     }
 
-
-    /*
-    //Change
-    public void onClick_B0(View view) {
-        currentBotIndex = 0;
-        botKey = botFinder.getKey(buttonArray[0]);
-
-        // set button colors
-        deselectButtonColors();
-        button0.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
-        button0.setTextColor(ContextCompat.getColor(this, R.color.white));
-        updateScreen();
-    }
-    public void onClick_B1(View view) {
-        currentBotIndex = 1;
-        botKey = botFinder.getKey(buttonArray[1]);
-
-        // set button colors
-        deselectButtonColors();
-        button1.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
-        button1.setTextColor(ContextCompat.getColor(this, R.color.white));
-        updateScreen();
-    }
-    public void onClick_B2(View view) {
-        currentBotIndex = 2;
-        botKey = botFinder.getKey(buttonArray[2]);
-
-        // set button colors
-        deselectButtonColors();
-        button2.setTextColor(ContextCompat.getColor(this, R.color.white));
-        button2.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
-        updateScreen();
-    }
-
-    public void deselectButtonColors() {
-        button0.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
-        button0.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
-
-        button1.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
-        button1.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
-
-
-        button2.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.lightGray), PorterDuff.Mode.MULTIPLY);
-        button2.setTextColor(ContextCompat.getColor(this, R.color.darkGray));
-
-    }
-    */
 
     // deselect button colors
     public void deselectButtonColors(Button[] buttons) {

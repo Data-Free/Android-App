@@ -10,7 +10,10 @@ class BotFinder {
 
     //Given a String id, return proper key
     String getKey(String name) {
+
+        if (name == null) { return "getKey(null)"; }
         String result = "";
+
         switch(name) {
             case "tutorial":
                 result = "aa";
@@ -32,7 +35,10 @@ class BotFinder {
     }
 
     String getInfo(String name) {
+
+        if (name == null) { return "getInfo(null)"; }
         String result = "";
+
         switch(name) {
             case "tutorial":
                 result = "Learn how to use data free";
@@ -59,11 +65,10 @@ class BotFinder {
     }
 
     String getName(String name) {
+
+        if (name == null) { return "getName(null)"; }
         String result = "";
 
-        if (name == null) {
-            name = "test";
-        }
         switch(name) {
             case "tutorial":
                 result = "Tutorial";
