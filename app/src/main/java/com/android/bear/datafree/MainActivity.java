@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
     //---- Buttons and User UI -----
     Button sendButton;
-    //Button button0, button1, button2;
+    final int numberOfButtons = 5;
     Button[] botButtons;
     TextView infoBox;           //displays info for currently selected bot
     TextView messageDisplay;    //test variable to display message
@@ -157,14 +157,14 @@ public class MainActivity extends AppCompatActivity {
         //------------
 
         //set up buttonArray
-        buttonArray = new String[5];    //length = number of bots
+        buttonArray = new String[numberOfButtons];    //length = number of bots
         buttonArray[0] = "suggestions";
         buttonArray[1] = "wikipedia";
         buttonArray[2] = "urban_dic";
 
         //set up buttons
         sendButton = (Button) findViewById(R.id.send);
-        botButtons = createBotButtons(5);
+        botButtons = createBotButtons(numberOfButtons);
         infoBox = (TextView) findViewById(R.id.infoBox);
         messageDisplay = (TextView) findViewById(R.id.messageDisplay);
 
@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         verifiedNumbers.setServerNumber(serverNumber, this);
 
 
+        updateButtonColors(botButtons[0]);
         updateScreen();
     }
 
