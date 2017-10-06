@@ -51,7 +51,9 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
 
 
-    //---DECLARE VARIABLES--------------------------------------------------------------------------
+    //==============================================================================================
+    // Variables
+    //==============================================================================================
 
     //---- Reading SMS -----!
     static MainActivity inst;
@@ -98,7 +100,14 @@ public class MainActivity extends AppCompatActivity {
     VerifiedNumbersSingleton verifiedNumbers = VerifiedNumbersSingleton.getInstance();
 
 
-    //---ON START-----------------------------------------------------------------------------------
+
+    //==============================================================================================
+    // Start Up
+    //==============================================================================================
+    /*
+        Functions to be run when starting up
+         - onCreate, onStart, onResume
+     */
 
     public static MainActivity instance() {
         return inst;
@@ -201,7 +210,14 @@ public class MainActivity extends AppCompatActivity {
         updateScreen();
     }
 
-    //---GET PERMISSIONS----------------------------------------------------------------------------
+
+
+    //==============================================================================================
+    // Permissions
+    //==============================================================================================
+    /*
+        Functions for getting necessary permissions from the user
+     */
 
     public void getPermissionToReadSMS() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
@@ -234,19 +250,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //---MENU BUTTONS-------------------------------------------------------------------------------
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.add_number:
-                createPopUp(this, 0, "New Server Number\ncurrent: " + serverNumber, "5551119999");
-                return true;
-        }
-        return false;
-    }
 
-    //---UPDATE SCREEN------------------------------------------------------------------------------
+
+    //==============================================================================================
+    // Visuals and UI
+    //==============================================================================================
+
+    //---Update Screen------------------------------------------------------------------------------
+    /*
+        Functions for updating visuals on screen
+     */
 
     // gets called when app receives a new, valid text
     public void updateInbox(String smsMessageStr) {
@@ -271,8 +285,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    //---Chat UI------------------------------------------------------------------------------------
+    /*
+        Functions having to do with the list view chat interface
+        Utilizes ChatAdapter.java, list_item_chat_message.xml, and ChatMessage.java
+     */
 
-    //---CONCERNING MESSAGES------------------------------------------------------------------------
+    private ListView messagesContainer;
+    private ChatAdapter adapter;
+    private ArrayList<ChatMessage> chatHistory;
+
+    private void setUpChatUI() {
+        messagesContainer = (ListView) findViewById(R.id.messagesContainer);
+        chatHistory = new ArrayList<ChatMessage>();
+        adapter = new ChatAdapter(MainActivity.this, new ArrayList<ChatMessage>());
+        messagesContainer.setAdapter(adapter);
+    }
+
+    public void displayMessage(ChatMessage message) {
+        adapter.add(message);
+        adapter.notifyDataSetChanged();
+        scroll();
+    }
+    private void scroll() {
+        messagesContainer.setSelection(messagesContainer.getCount() - 1);
+    }
+
+
+
+
+    //==============================================================================================
+    // Messages
+    //==============================================================================================
+    /*
+        Functions devoted to communications between the client and the server
+        This involves sending and receiving texts
+     */
 
     //Sends SMS Declaration Request to Data Free Server
     public void onSendClick(View view) {
@@ -288,8 +336,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // CHAT UI
-            messageET = (EditText) findViewById(R.id.input);
-            String messageText = messageET.getText().toString();
+            String messageText = input.getText().toString();
             if (TextUtils.isEmpty(messageText)) {
                 return;
             }
@@ -428,13 +475,30 @@ public class MainActivity extends AppCompatActivity {
                 incomingPackages.get(packageSlot).complete();
             }
 
-
         }
     }
 
+
     //==============================================================================================
-    // Bot Buttons
+    // BUTTONS
     //==============================================================================================
+
+    //---Menu Buttons-------------------------------------------------------------------------------
+     /*
+        Functions having to do with menu actions (the activity bar)
+     */
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.add_number:
+                createPopUp(this, 0, "New Server Number\ncurrent: " + serverNumber, "5551119999");
+                return true;
+        }
+        return false;
+    }
+
+    //---Bot Buttons--------------------------------------------------------------------------------
     /*
         These functions are devoted to the bot buttons, the buttons at the top of the page that
           let the user switch between selected bots/services. The buttons assign botkeys
@@ -481,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
         return botButtons;
     }
 
-    //
+    // updates colors of bot buttons to reflect which one is selected
     public void updateButtonColors(Button b) {
         deselectButtonColors(botButtons);
         b.getBackground().setColorFilter(ContextCompat.getColor(this, R.color.colorAccent), PorterDuff.Mode.MULTIPLY);
@@ -555,80 +619,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     //==============================================================================================
-    // Chat UI
+    // Utilities
     //==============================================================================================
-
-    private EditText messageET;
-    private ListView messagesContainer;
-    private Button sendBtn;
-    private ChatAdapter adapter;
-    private ArrayList<ChatMessage> chatHistory;
-
-    private void setUpChatUI() {
-        messagesContainer = (ListView) findViewById(R.id.messagesContainer);
-        sendBtn = (Button) findViewById(R.id.send);
-
-        loadDummyHistory();
-
-        /*
-        sendBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                messageET = (EditText) findViewById(R.id.input);
-                String messageText = messageET.getText().toString();
-                if (TextUtils.isEmpty(messageText)) {
-                    return;
-                }
-
-                ChatMessage chatMessage = new ChatMessage();
-                chatMessage.setId(122);//dummy
-                chatMessage.setMessage(messageText);
-                chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-                chatMessage.setMe(true);
-
-                messageET.setText("");
-
-                displayMessage(chatMessage);
-            }
-        }); */
-    }
-
-    public void displayMessage(ChatMessage message) {
-        adapter.add(message);
-        adapter.notifyDataSetChanged();
-        scroll();
-    }
-    private void scroll() {
-        messagesContainer.setSelection(messagesContainer.getCount() - 1);
-    }
-
-    private void loadDummyHistory(){
-
-        chatHistory = new ArrayList<ChatMessage>();
-
-        ChatMessage msg = new ChatMessage();
-        msg.setId(1);
-        msg.setMe(false);
-        msg.setMessage("Hi");
-        msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-        chatHistory.add(msg);
-        ChatMessage msg1 = new ChatMessage();
-        msg1.setId(2);
-        msg1.setMe(false);
-        msg1.setMessage("How r u doing???");
-        msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));
-        chatHistory.add(msg1);
-
-        adapter = new ChatAdapter(MainActivity.this, new ArrayList<ChatMessage>());
-        messagesContainer.setAdapter(adapter);
-
-        for(int i=0; i<chatHistory.size(); i++) {
-            ChatMessage message = chatHistory.get(i);
-            displayMessage(message);
-        }
-    }
-
-    //---UTILITIES----------------------------------------------------------------------------------
+    /*
+        Functions for general purpose help. Such as, toasts
+     */
 
     public void toast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
