@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +44,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         //set up sms reading
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        messages = (ListView) findViewById(R.id.messages);
+        messages = (ListView) findViewById(R.id.messagesContainer);
         input = (EditText) findViewById(R.id.input);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
         messages.setAdapter(arrayAdapter);
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-        //------------
+
 
         //set up buttonArray
         buttonArray = new String[numberOfButtons];    //length = number of bots
@@ -193,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         updateButtonColors(botButtons[0]);
+        setUpChatUI();
         updateScreen();
     }
 
@@ -281,6 +286,21 @@ public class MainActivity extends AppCompatActivity {
             if (input.getText().toString().length() < 1) {
                 return;
             }
+
+            // CHAT UI
+            messageET = (EditText) findViewById(R.id.input);
+            String messageText = messageET.getText().toString();
+            if (TextUtils.isEmpty(messageText)) {
+                return;
+            }
+
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setId(122);//dummy
+            chatMessage.setMessage(messageText);
+            chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+            chatMessage.setMe(true);
+            displayMessage(chatMessage);
+
 
             // SEND SMS TO SERVER
 
@@ -412,7 +432,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //---BOT BUTTONS--------------------------------------------------------------------------------
+    //==============================================================================================
+    // Bot Buttons
+    //==============================================================================================
+    /*
+        These functions are devoted to the bot buttons, the buttons at the top of the page that
+          let the user switch between selected bots/services. The buttons assign botkeys
+     */
 
 
     // createBotButtons
@@ -474,7 +500,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //---Memory-------------------------------------------------------------------------------------
+    //==============================================================================================
+    // Memory
+    //==============================================================================================
+    /*
+        Functions devoted to memory
+     */
 
     // saves a value to memory at label
     public void saveToMemory(String label, String value) {
@@ -522,6 +553,80 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+
+    //==============================================================================================
+    // Chat UI
+    //==============================================================================================
+
+    private EditText messageET;
+    private ListView messagesContainer;
+    private Button sendBtn;
+    private ChatAdapter adapter;
+    private ArrayList<ChatMessage> chatHistory;
+
+    private void setUpChatUI() {
+        messagesContainer = (ListView) findViewById(R.id.messagesContainer);
+        sendBtn = (Button) findViewById(R.id.send);
+
+        loadDummyHistory();
+
+        /*
+        sendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                messageET = (EditText) findViewById(R.id.input);
+                String messageText = messageET.getText().toString();
+                if (TextUtils.isEmpty(messageText)) {
+                    return;
+                }
+
+                ChatMessage chatMessage = new ChatMessage();
+                chatMessage.setId(122);//dummy
+                chatMessage.setMessage(messageText);
+                chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+                chatMessage.setMe(true);
+
+                messageET.setText("");
+
+                displayMessage(chatMessage);
+            }
+        }); */
+    }
+
+    public void displayMessage(ChatMessage message) {
+        adapter.add(message);
+        adapter.notifyDataSetChanged();
+        scroll();
+    }
+    private void scroll() {
+        messagesContainer.setSelection(messagesContainer.getCount() - 1);
+    }
+
+    private void loadDummyHistory(){
+
+        chatHistory = new ArrayList<ChatMessage>();
+
+        ChatMessage msg = new ChatMessage();
+        msg.setId(1);
+        msg.setMe(false);
+        msg.setMessage("Hi");
+        msg.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+        chatHistory.add(msg);
+        ChatMessage msg1 = new ChatMessage();
+        msg1.setId(2);
+        msg1.setMe(false);
+        msg1.setMessage("How r u doing???");
+        msg1.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+        chatHistory.add(msg1);
+
+        adapter = new ChatAdapter(MainActivity.this, new ArrayList<ChatMessage>());
+        messagesContainer.setAdapter(adapter);
+
+        for(int i=0; i<chatHistory.size(); i++) {
+            ChatMessage message = chatHistory.get(i);
+            displayMessage(message);
+        }
+    }
 
     //---UTILITIES----------------------------------------------------------------------------------
 
