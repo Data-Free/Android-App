@@ -6,7 +6,7 @@ package com.android.bear.datafree;
 
 public class ChatMessage {
     private int id;
-    private boolean isMe;
+    private boolean onRight;
     private String message;
     private Long userId;
 
@@ -15,24 +15,29 @@ public class ChatMessage {
     ChatMessage(String newMessage, int newID, boolean newOrientation) {
         message = newMessage;
         id = newID;
-        isMe = newOrientation;
+        onRight = newOrientation;
     }
 
     public long getId() {
         return id;
     }
+
     void setId(int id) {
         this.id = id;
     }
-    boolean getIsme() {
-        return isMe;
+
+    boolean getOrientation() {
+        return onRight;
     }
-    void setMe(boolean isMe) {
-        this.isMe = isMe;
+
+    void setOrientation(boolean orientation) {
+        onRight = orientation;
     }
+
     String getMessage() {
         return message;
     }
+
     void setMessage(String message) {
         this.message = message;
     }

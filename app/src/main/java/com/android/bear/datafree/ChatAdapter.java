@@ -83,7 +83,7 @@ public class ChatAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        boolean myMsg = chatMessage.getIsme() ;//Just a dummy check
+        boolean myMsg = chatMessage.getOrientation() ;//Just a dummy check
         //to simulate whether it me or other sender
         setAlignment(holder, myMsg);
         holder.txtMessage.setText(chatMessage.getMessage());
@@ -100,8 +100,8 @@ public class ChatAdapter extends BaseAdapter {
         chatMessages.addAll(messages);
     }
 
-    private void setAlignment(ViewHolder holder, boolean isMe) {
-        if (isMe) {
+    private void setAlignment(ViewHolder holder, boolean onRight) {
+        if (onRight) {
             //Drawable bubble = Resources.getSystem().getDrawable(R.drawable.in_message_bg);
             //bubble.setColorFilter(Color.GRAY, null);
             holder.contentWithBG.setBackgroundResource(R.drawable.text_left); // in_message_bg
