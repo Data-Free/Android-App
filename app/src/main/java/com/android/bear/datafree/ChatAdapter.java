@@ -137,10 +137,6 @@ public class ChatAdapter extends BaseAdapter {
             layoutParams = (LinearLayout.LayoutParams) holder.txtMessage.getLayoutParams();
             layoutParams.gravity = Gravity.LEFT;
             holder.txtMessage.setLayoutParams(layoutParams);
-
-            layoutParams = (LinearLayout.LayoutParams) holder.txtInfo.getLayoutParams();
-            layoutParams.gravity = Gravity.LEFT;
-            holder.txtInfo.setLayoutParams(layoutParams);
         }
     }
 
@@ -155,7 +151,6 @@ public class ChatAdapter extends BaseAdapter {
 
     private static class ViewHolder {
         TextView txtMessage;
-        TextView txtInfo;
         LinearLayout content;
         LinearLayout contentWithBG;
     }

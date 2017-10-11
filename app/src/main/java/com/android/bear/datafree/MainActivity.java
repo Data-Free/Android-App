@@ -313,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
     //==============================================================================================
     // Messages
     //==============================================================================================
@@ -339,11 +338,8 @@ public class MainActivity extends AppCompatActivity {
 
             // CHAT UI
             String messageText = input.getText().toString();
-
-            ChatMessage chatMessage = new ChatMessage();
-            chatMessage.setId(122);//dummy
-            chatMessage.setMessage(inputText);
-            chatMessage.setMe(true);
+            int fakeID = 122;
+            ChatMessage chatMessage= new ChatMessage(messageText, fakeID, true);
             displayMessage(chatMessage);
 
 
@@ -466,10 +462,13 @@ public class MainActivity extends AppCompatActivity {
 
                 fullAnswer = huffDecoder.decode(fullAnswer, wordList);
                 fullAnswer = fixCapitals.fixCapitalization(fullAnswer);
-                messageDisplay.setText(fullAnswer);
+                //messageDisplay.setText(fullAnswer);
 
                 // set package to be complete
                 incomingPackages.get(packageSlot).complete();
+
+                ChatMessage chatMessage = new ChatMessage(fullAnswer, 32, false);
+                displayMessage(chatMessage);
             }
 
         }

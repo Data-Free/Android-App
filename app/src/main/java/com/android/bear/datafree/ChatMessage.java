@@ -5,15 +5,23 @@ package com.android.bear.datafree;
  */
 
 public class ChatMessage {
-    private long id;
+    private int id;
     private boolean isMe;
     private String message;
     private Long userId;
 
+    ChatMessage(){}
+
+    ChatMessage(String newMessage, int newID, boolean newOrientation) {
+        message = newMessage;
+        id = newID;
+        isMe = newOrientation;
+    }
+
     public long getId() {
         return id;
     }
-    void setId(long id) {
+    void setId(int id) {
         this.id = id;
     }
     boolean getIsme() {
