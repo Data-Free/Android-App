@@ -330,27 +330,24 @@ public class MainActivity extends AppCompatActivity {
             getPermissionToReadSMS();
         } else {
 
+            String inputText = input.getText().toString();
+
             // check if there is anything to send
-            if (input.getText().toString().length() < 1) {
+            if (inputText.length() < 1) {
                 return;
             }
 
             // CHAT UI
             String messageText = input.getText().toString();
-            if (TextUtils.isEmpty(messageText)) {
-                return;
-            }
 
             ChatMessage chatMessage = new ChatMessage();
             chatMessage.setId(122);//dummy
-            chatMessage.setMessage(messageText);
-            chatMessage.setDate(DateFormat.getDateTimeInstance().format(new Date()));
+            chatMessage.setMessage(inputText);
             chatMessage.setMe(true);
             displayMessage(chatMessage);
 
 
             // SEND SMS TO SERVER
-
             // only try to send if serverNumber is a real number
             if(serverNumber.length() == 12) {
                 // 1) create packageSlot in a non active package index
@@ -377,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
                 String botCase = "c"; // CHANGE THIS
 
                 // 5) format text: { bk r p ...
-                toServer = "{" + botKey + botCase + packageSlot + input.getText().toString();
+                toServer = "{" + botKey + botCase + packageSlot + inputText;
 
                 smsManager.sendTextMessage(serverNumber, null, toServer, null, null);
                 Toast.makeText(this, "Request Declaration sent!", Toast.LENGTH_SHORT).show();

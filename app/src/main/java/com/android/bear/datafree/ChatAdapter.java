@@ -87,12 +87,12 @@ public class ChatAdapter extends BaseAdapter {
         //to simulate whether it me or other sender
         setAlignment(holder, myMsg);
         holder.txtMessage.setText(chatMessage.getMessage());
-        holder.txtInfo.setText(chatMessage.getDate());
+        //holder.txtInfo.setText(chatMessage.getDate());
 
         return convertView;
     }
 
-    public void add(ChatMessage message) {
+    void add(ChatMessage message) {
         chatMessages.add(message);
     }
 
@@ -121,9 +121,6 @@ public class ChatAdapter extends BaseAdapter {
             layoutParams.gravity = Gravity.RIGHT;
             holder.txtMessage.setLayoutParams(layoutParams);
 
-            layoutParams = (LinearLayout.LayoutParams) holder.txtInfo.getLayoutParams();
-            layoutParams.gravity = Gravity.RIGHT;
-            holder.txtInfo.setLayoutParams(layoutParams);
         } else {
             holder.contentWithBG.setBackgroundResource(R.drawable.text_right); //out_message_bg
 
@@ -152,7 +149,7 @@ public class ChatAdapter extends BaseAdapter {
         holder.txtMessage = (TextView) v.findViewById(R.id.txtMessage);
         holder.content = (LinearLayout) v.findViewById(R.id.content);
         holder.contentWithBG = (LinearLayout) v.findViewById(R.id.contentWithBackground);
-        holder.txtInfo = (TextView) v.findViewById(R.id.txtInfo);
+        //holder.txtInfo = (TextView) v.findViewById(R.id.txtInfo);
         return holder;
     }
 
