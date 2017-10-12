@@ -36,6 +36,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
@@ -44,9 +47,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     static MainActivity inst;
     ArrayList<String> smsMessagesList = new ArrayList<>();
     SmsManager smsManager = SmsManager.getDefault();
-    ListView messages;
     ArrayAdapter arrayAdapter;
     private static final int READ_SMS_PERMISSIONS_REQUEST = 1;
     String incomingContent = "";    //stores incoming sms from server
@@ -131,10 +135,8 @@ public class MainActivity extends AppCompatActivity {
         //set up sms reading
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        messages = (ListView) findViewById(R.id.messagesContainer);
         input = (EditText) findViewById(R.id.input);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, smsMessagesList);
-        messages.setAdapter(arrayAdapter);
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_SMS)
                 != PackageManager.PERMISSION_GRANTED) {
             getPermissionToReadSMS();
@@ -292,19 +294,17 @@ public class MainActivity extends AppCompatActivity {
      */
 
     private ListView messagesContainer;
-    private ChatAdapter adapter;
-    private ArrayList<ChatMessage> chatHistory;
+    private ChatAdapter chatAdapter;
 
     private void setUpChatUI() {
         messagesContainer = (ListView) findViewById(R.id.messagesContainer);
-        chatHistory = new ArrayList<ChatMessage>();
-        adapter = new ChatAdapter(MainActivity.this, new ArrayList<ChatMessage>());
-        messagesContainer.setAdapter(adapter);
+        chatAdapter = new ChatAdapter(MainActivity.this, new ArrayList<ChatMessage>());
+        messagesContainer.setAdapter(chatAdapter);
     }
 
     public void displayMessage(ChatMessage message) {
-        adapter.add(message);
-        adapter.notifyDataSetChanged();
+        chatAdapter.add(message);
+        chatAdapter.notifyDataSetChanged();
         scroll();
     }
     private void scroll() {
@@ -524,13 +524,15 @@ public class MainActivity extends AppCompatActivity {
             newButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
+                    saveMessagesToMemory();
+
                     // select correct bot
                     int tag = Integer.parseInt(v.getTag().toString());
                     currentBotIndex = tag;
                     botKey = botFinder.getKey(buttonArray[currentBotIndex]);
-
-                    // assign button colors
                     updateButtonColors(newButton);
+
+                    loadMessagesFromMemory();
                 }
             });
 
@@ -566,12 +568,43 @@ public class MainActivity extends AppCompatActivity {
     /*
         Functions devoted to memory
      */
+    Gson gson = new Gson();
+
 
     // saves a value to memory at label
-    public void saveToMemory(String label, String value) {
+    public void saveStringToMemory(String label, String value) {
         SharedPreferences memory = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editMemory = memory.edit();
         editMemory.putString(label, value).apply();
+    }
+
+    // takes messages in messages container and commits them to memory
+    // saves memory in JSON
+    public void saveMessagesToMemory() {
+        List<ChatMessage> listOfMessages = chatAdapter.getAllItems();
+        Type structure = new TypeToken<List<ChatMessage>>() {}.getType();
+        String messagesJSON = gson.toJson(listOfMessages, structure);
+        saveStringToMemory(botKey, messagesJSON);
+    }
+
+    // loads messages from memory into the ChatAdapter
+    public void loadMessagesFromMemory() {
+
+        // clear chatAdapter
+        chatAdapter.clearChatAdapter();
+
+        // get JSON object of messages from memory by using botKey as label
+        SharedPreferences memory = PreferenceManager.getDefaultSharedPreferences(this);
+        String messagesJSON = memory.getString(botKey, "");
+
+        // convert JSON to List<ChatMessage>
+        Type structure = new TypeToken<List<ChatMessage>>() {}.getType();
+        List<ChatMessage> listOfMessages = gson.fromJson(messagesJSON, structure);
+
+        // set chatAdapter.chatMessages = List<ChatMessage>
+        System.out.println(listOfMessages);
+        chatAdapter.addListOfMessages(listOfMessages);
+        chatAdapter.notifyDataSetChanged();
     }
 
     // creates a pop up, commits answer to memory
@@ -596,7 +629,7 @@ public class MainActivity extends AppCompatActivity {
                     if(("+1" + et.getText().toString()).length() == 12) {
                         serverNumber = "+1" + et.getText().toString();
                         verifiedNumbers.setServerNumber(serverNumber, context);
-                        saveToMemory("serverNumber", serverNumber);
+                        saveStringToMemory("serverNumber", serverNumber);
                         toast(verifiedNumbers.getNumber());
                     } else {
                         toast("Number not added");

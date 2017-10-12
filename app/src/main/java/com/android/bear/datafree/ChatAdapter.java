@@ -2,6 +2,7 @@ package com.android.bear.datafree;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,11 +58,22 @@ public class ChatAdapter extends BaseAdapter {
 
     @Override
     public ChatMessage getItem(int position) {
-        if (chatMessages != null) {
-            return chatMessages.get(position);
+        if (chatMessages != null && chatMessages.size() >= position) {
+            System.out.println("WHAT THE FUCK");
+            System.out.println("SIZE: " + chatMessages.size() + ", Position: " + position);
+            System.out.println(chatMessages);
+            System.out.println("1: " + chatMessages.get(position));
+            System.out.println("Type: " + chatMessages.get(position).getClass().getName());
+            ChatMessage item = chatMessages.get(position);
+            return item;
+            //return chatMessages.get(position);
         } else {
             return null;
         }
+    }
+
+    public List<ChatMessage> getAllItems() {
+        return chatMessages;
     }
 
     @Override
@@ -72,6 +84,7 @@ public class ChatAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+
         ChatMessage chatMessage = getItem(position);
         LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -87,7 +100,6 @@ public class ChatAdapter extends BaseAdapter {
         //to simulate whether it me or other sender
         setAlignment(holder, myMsg);
         holder.txtMessage.setText(chatMessage.getMessage());
-        //holder.txtInfo.setText(chatMessage.getDate());
 
         return convertView;
     }
@@ -96,8 +108,15 @@ public class ChatAdapter extends BaseAdapter {
         chatMessages.add(message);
     }
 
-    public void add(List<ChatMessage> messages) {
-        chatMessages.addAll(messages);
+    // DEBUGGING THIS
+    public void addListOfMessages(List<ChatMessage> messages) {
+        if (messages != null) {
+            chatMessages.addAll(messages);
+        }
+    }
+
+    public void clearChatAdapter() {
+        chatMessages.clear();
     }
 
     private void setAlignment(ViewHolder holder, boolean onRight) {
@@ -145,7 +164,6 @@ public class ChatAdapter extends BaseAdapter {
         holder.txtMessage = (TextView) v.findViewById(R.id.txtMessage);
         holder.content = (LinearLayout) v.findViewById(R.id.content);
         holder.contentWithBG = (LinearLayout) v.findViewById(R.id.contentWithBackground);
-        //holder.txtInfo = (TextView) v.findViewById(R.id.txtInfo);
         return holder;
     }
 
